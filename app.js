@@ -1,15 +1,15 @@
-const STORAGE_KEY = "tabiroku-mobile-screens-v1";
+const STORAGE_KEY = "tabiroku-mobile-screens-v2";
 
 const screenOrder = ["welcome", "scenario", "tone", "preview", "journey", "album", "impact"];
 
 const screenMeta = {
   welcome: { eyebrow: "Gift a Journey", title: "旅録", badge: "送り主", phase: "gift" },
-  scenario: { eyebrow: "Sender Mode", title: "旅を選ぶ", badge: "送り主", phase: "gift" },
-  tone: { eyebrow: "Sender Mode", title: "気持ちを選ぶ", badge: "送り主", phase: "gift" },
-  preview: { eyebrow: "Sender Mode", title: "届くギフト", badge: "送り主", phase: "gift" },
-  journey: { eyebrow: "Traveler Mode", title: "旅先で記録", badge: "旅行者", phase: "travel" },
-  album: { eyebrow: "Traveler Mode", title: "旅アルバム", badge: "旅行者", phase: "after" },
-  impact: { eyebrow: "Regional Value", title: "地域に返る価値", badge: "地域", phase: "after" }
+  scenario: { eyebrow: "Gift", title: "旅を選ぶ", badge: "送り主", phase: "gift" },
+  tone: { eyebrow: "Gift", title: "ひとこと", badge: "送り主", phase: "gift" },
+  preview: { eyebrow: "Gift", title: "確認", badge: "送り主", phase: "gift" },
+  journey: { eyebrow: "Travel", title: "旅先ログ", badge: "旅行者", phase: "travel" },
+  album: { eyebrow: "Travel", title: "アルバム", badge: "旅行者", phase: "after" },
+  impact: { eyebrow: "Region", title: "地域価値", badge: "地域", phase: "after" }
 };
 
 const toneOptions = [
@@ -23,13 +23,13 @@ const scenarios = [
   {
     id: "mother-retirement",
     title: "退職祝いで母へ",
-    summary: "温泉地で、ひと息つける1泊2日",
+    summary: "温泉地でひと息つける 1泊2日",
     regionId: "nagano",
     recipient: "母へ",
     occasion: "退職祝い",
     duration: "1泊2日",
     budget: 50000,
-    badge: "いちばん人気",
+    badge: "人気",
     messages: {
       thanks: "これまで本当にありがとう。肩の力がほどける旅を贈ります。",
       otsukare: "おつかれさまの気持ちを込めて、静かな景色の旅を選びました。",
@@ -40,7 +40,7 @@ const scenarios = [
   {
     id: "friend-wedding",
     title: "結婚祝いで友人へ",
-    summary: "街歩きと美食を楽しむ2泊3日",
+    summary: "街歩きと美食を楽しむ 2泊3日",
     regionId: "kanazawa",
     recipient: "友人へ",
     occasion: "結婚祝い",
@@ -57,7 +57,7 @@ const scenarios = [
   {
     id: "parents-gratitude",
     title: "感謝を伝える旅を両親へ",
-    summary: "海辺でゆっくり味わう1泊2日",
+    summary: "海辺でゆっくり味わう 1泊2日",
     regionId: "setouchi",
     recipient: "両親へ",
     occasion: "感謝を伝える旅",
@@ -81,32 +81,13 @@ const regions = {
     gradient: "linear-gradient(145deg, rgba(29, 67, 58, 0.96), rgba(109, 155, 121, 0.92))",
     albumGradients: [
       "linear-gradient(145deg, rgba(69, 114, 83, 0.94), rgba(166, 202, 154, 0.82))",
-      "linear-gradient(145deg, rgba(44, 83, 70, 0.94), rgba(113, 156, 124, 0.86))",
-      "linear-gradient(145deg, rgba(104, 146, 118, 0.94), rgba(204, 218, 181, 0.84))"
+      "linear-gradient(145deg, rgba(44, 83, 70, 0.94), rgba(113, 156, 124, 0.86))"
     ],
-    ecLabel: "旅のあとに果実バターや森の香りの品へ広がる",
+    ecLabel: "旅後に果実バターや森の香りの品へ広がる",
     stops: [
-      {
-        id: "nagano-inn",
-        name: "森あいの宿",
-        type: "宿泊",
-        spend: 24000,
-        note: "チェックインした瞬間に、贈り主のメッセージが旅ログへ残ります。"
-      },
-      {
-        id: "nagano-soba",
-        name: "川辺のそば処",
-        type: "食",
-        spend: 3800,
-        note: "地域の味と店主のひとことが、写真と一緒にまとまります。"
-      },
-      {
-        id: "nagano-forest",
-        name: "森のガイドウォーク",
-        type: "体験",
-        spend: 6800,
-        note: "歩いた景色がそのまま旅アルバムの一枚になります。"
-      }
+      { id: "nagano-inn", name: "森あいの宿", type: "宿泊", spend: 24000, note: "贈り主の気持ちが到着ログに残る" },
+      { id: "nagano-soba", name: "川辺のそば処", type: "食", spend: 3800, note: "地域の味が旅ログにまとまる" },
+      { id: "nagano-forest", name: "森のガイドウォーク", type: "体験", spend: 6800, note: "歩いた景色がアルバムの一枚になる" }
     ]
   },
   kanazawa: {
@@ -116,32 +97,13 @@ const regions = {
     gradient: "linear-gradient(145deg, rgba(63, 37, 57, 0.96), rgba(171, 114, 100, 0.92))",
     albumGradients: [
       "linear-gradient(145deg, rgba(144, 101, 83, 0.94), rgba(89, 52, 67, 0.86))",
-      "linear-gradient(145deg, rgba(181, 133, 102, 0.94), rgba(106, 69, 83, 0.84))",
-      "linear-gradient(145deg, rgba(94, 59, 75, 0.94), rgba(190, 148, 109, 0.82))"
+      "linear-gradient(145deg, rgba(181, 133, 102, 0.94), rgba(106, 69, 83, 0.84))"
     ],
-    ecLabel: "旅のあとに器や和菓子などの地域ECにつながる",
+    ecLabel: "旅後に器や和菓子などの地域ECにつながる",
     stops: [
-      {
-        id: "kanazawa-machiya",
-        name: "町家ステイ",
-        type: "宿泊",
-        spend: 27000,
-        note: "古い街並みの空気感まで、旅ログの表紙にのります。"
-      },
-      {
-        id: "kanazawa-craft",
-        name: "工芸と茶のひととき",
-        type: "体験",
-        spend: 5400,
-        note: "手仕事の時間が、思い出の温度を上げてくれます。"
-      },
-      {
-        id: "kanazawa-food",
-        name: "旬の小さな会席",
-        type: "食",
-        spend: 6200,
-        note: "地域の食体験が、旅のストーリーを締めくくります。"
-      }
+      { id: "kanazawa-machiya", name: "町家ステイ", type: "宿泊", spend: 27000, note: "街の空気感まで表紙にのる" },
+      { id: "kanazawa-craft", name: "工芸と茶のひととき", type: "体験", spend: 5400, note: "手仕事の時間が温度を上げる" },
+      { id: "kanazawa-food", name: "旬の小さな会席", type: "食", spend: 6200, note: "地域の食体験で旅が締まる" }
     ]
   },
   setouchi: {
@@ -151,32 +113,13 @@ const regions = {
     gradient: "linear-gradient(145deg, rgba(28, 70, 81, 0.96), rgba(113, 165, 190, 0.92))",
     albumGradients: [
       "linear-gradient(145deg, rgba(77, 135, 161, 0.94), rgba(214, 183, 133, 0.84))",
-      "linear-gradient(145deg, rgba(40, 96, 115, 0.94), rgba(126, 180, 197, 0.84))",
-      "linear-gradient(145deg, rgba(126, 184, 197, 0.94), rgba(235, 202, 145, 0.82))"
+      "linear-gradient(145deg, rgba(40, 96, 115, 0.94), rgba(126, 180, 197, 0.84))"
     ],
-    ecLabel: "旅のあとにレモンカードや海辺の工芸品へ広がる",
+    ecLabel: "旅後にレモンカードや海辺の工芸品へ広がる",
     stops: [
-      {
-        id: "setouchi-inn",
-        name: "島影の小さな宿",
-        type: "宿泊",
-        spend: 23000,
-        note: "海の気配まで伝わる一泊が、旅の核になります。"
-      },
-      {
-        id: "setouchi-ferry",
-        name: "船でめぐる夕景ルート",
-        type: "移動体験",
-        spend: 2600,
-        note: "移動そのものが、思い出の一枚として残ります。"
-      },
-      {
-        id: "setouchi-workshop",
-        name: "器とクラフトの工房",
-        type: "体験",
-        spend: 6100,
-        note: "手で触れた時間が、地域との接点を深くします。"
-      }
+      { id: "setouchi-inn", name: "島影の小さな宿", type: "宿泊", spend: 23000, note: "海の気配まで伝わる一泊" },
+      { id: "setouchi-ferry", name: "船でめぐる夕景ルート", type: "移動", spend: 2600, note: "移動そのものが思い出になる" },
+      { id: "setouchi-workshop", name: "器とクラフトの工房", type: "体験", spend: 6100, note: "手で触れた時間が接点になる" }
     ]
   }
 };
@@ -241,13 +184,8 @@ function saveState() {
 }
 
 function bindEvents() {
-  elements.navBack.addEventListener("click", () => {
-    goBack();
-  });
-
-  elements.primaryAction.addEventListener("click", () => {
-    handlePrimaryAction();
-  });
+  elements.navBack.addEventListener("click", () => goBack());
+  elements.primaryAction.addEventListener("click", () => handlePrimaryAction());
 
   elements.screenView.addEventListener("click", (event) => {
     const target = event.target;
@@ -280,38 +218,19 @@ function bindEvents() {
       return;
     }
 
-    const action = button.dataset.action;
-    if (!action) {
-      return;
-    }
-
-    if (action === "toggle-custom") {
+    if (button.dataset.action === "toggle-custom") {
       toggleCustomMessage();
       return;
     }
 
-    if (action === "goto-scenario") {
-      navigateTo("scenario", "forward");
-      return;
-    }
-
-    if (action === "goto-welcome") {
-      navigateTo("welcome", "back");
-      return;
-    }
-
-    if (action === "restart") {
+    if (button.dataset.action === "restart") {
       resetFlow();
     }
   });
 
   elements.screenView.addEventListener("input", (event) => {
     const target = event.target;
-    if (!(target instanceof HTMLInputElement)) {
-      return;
-    }
-
-    if (target.id !== "customMessage") {
+    if (!(target instanceof HTMLInputElement) || target.id !== "customMessage") {
       return;
     }
 
@@ -322,9 +241,7 @@ function bindEvents() {
     }
   });
 
-  elements.celebration.addEventListener("click", () => {
-    hideCelebration();
-  });
+  elements.celebration.addEventListener("click", () => hideCelebration());
 }
 
 function sanitizeState() {
@@ -367,12 +284,24 @@ function sanitizeState() {
   }
 }
 
+function scenarioById(id) {
+  return scenarios.find((scenario) => scenario.id === id) || scenarios[0];
+}
+
 function currentScenario() {
-  return scenarios.find((scenario) => scenario.id === state.scenarioId) || scenarios[0];
+  return scenarioById(state.scenarioId);
+}
+
+function pendingScenario() {
+  return scenarioById(state.pendingScenarioId);
 }
 
 function currentRegion() {
   return regions[currentScenario().regionId];
+}
+
+function pendingRegion() {
+  return regions[pendingScenario().regionId];
 }
 
 function checkedStops() {
@@ -389,23 +318,20 @@ function resolvedMessage() {
 }
 
 function applyScenario(id) {
-  if (!scenarios.some((item) => item.id === id)) {
+  if (!scenarios.some((scenario) => scenario.id === id)) {
     return;
   }
-
   state.pendingScenarioId = id;
   saveState();
   render();
-  showToast("この旅を仮選択しました。隣の「決定」で進めます。");
 }
 
 function confirmScenario(id) {
-  if (!scenarios.some((item) => item.id === id)) {
+  if (!scenarios.some((scenario) => scenario.id === id)) {
     return;
   }
 
   state.pendingScenarioId = id;
-
   if (state.scenarioId !== id) {
     state.scenarioId = id;
     state.toneId = toneOptions[0].id;
@@ -424,12 +350,10 @@ function selectTone(id) {
   if (!toneOptions.some((tone) => tone.id === id)) {
     return;
   }
-
   state.toneId = id;
   if (!state.customMessage.trim()) {
     state.useCustomMessage = false;
   }
-
   saveState();
   render();
 }
@@ -438,13 +362,6 @@ function toggleCustomMessage() {
   state.useCustomMessage = !state.useCustomMessage;
   saveState();
   render();
-
-  if (state.useCustomMessage) {
-    const input = document.getElementById("customMessage");
-    if (input instanceof HTMLInputElement) {
-      input.focus();
-    }
-  }
 }
 
 function giftTrip() {
@@ -452,59 +369,34 @@ function giftTrip() {
   state.checkedStopIds = [];
   state.albumReady = false;
   navigateTo("journey", "forward");
-  showToast("旅を贈りました。ここから先は受け取った人の画面です。");
+  showToast("旅を贈りました。");
 }
 
 function checkIn(stopId) {
-  if (!state.gifted) {
-    showToast("まずは旅を贈ると、旅先の画面へ進めます。");
+  if (!state.gifted || state.checkedStopIds.includes(stopId)) {
     return;
   }
-
-  if (state.checkedStopIds.includes(stopId)) {
-    return;
-  }
-
   state.checkedStopIds.push(stopId);
   saveState();
   render();
-
-  if (state.checkedStopIds.length >= 2) {
-    showToast("思い出がそろいました。次は旅アルバムへ進めます。");
-  } else {
-    showToast("チェックインしました。あと1スポットで旅アルバムです。");
-  }
+  showToast(state.checkedStopIds.length >= 2 ? "次はアルバムです。" : "1つ記録しました。");
 }
 
 function buildAlbum() {
   if (state.checkedStopIds.length < 2) {
-    showToast("まずは2つチェックインしてください。");
     return;
   }
-
   state.albumReady = true;
   saveState();
   render();
-  showCelebration(
-    "旅アルバムができました",
-    "贈る人の想いと、旅する人の体験がひとつの記録になりました。"
-  );
+  showCelebration("旅アルバムができました", "想いと体験がひとつにまとまりました。");
 }
 
 function resetFlow() {
-  state.screenId = "welcome";
-  state.scenarioId = scenarios[0].id;
-  state.pendingScenarioId = scenarios[0].id;
-  state.toneId = toneOptions[0].id;
-  state.useCustomMessage = false;
-  state.customMessage = "";
-  state.gifted = false;
-  state.checkedStopIds = [];
-  state.albumReady = false;
+  Object.assign(state, { ...defaultState });
   navDirection = "back";
   saveState();
   render(true);
-  showToast("最初の画面に戻りました。");
 }
 
 function navigateTo(screenId, direction = "forward") {
@@ -518,15 +410,12 @@ function sanitizeScreenId(screenId) {
   if (!screenOrder.includes(screenId)) {
     return "welcome";
   }
-
   if (!state.gifted && ["journey", "album", "impact"].includes(screenId)) {
     return "preview";
   }
-
   if (!state.albumReady && screenId === "impact") {
     return "album";
   }
-
   return screenId;
 }
 
@@ -535,12 +424,10 @@ function goBack() {
   if (currentIndex <= 0) {
     return;
   }
-
   let target = screenOrder[currentIndex - 1];
   if (!state.gifted && ["journey", "album", "impact"].includes(target)) {
     target = "preview";
   }
-
   navigateTo(target, "back");
 }
 
@@ -549,19 +436,14 @@ function handlePrimaryAction() {
     navigateTo("scenario", "forward");
     return;
   }
-
   if (state.screenId === "scenario") {
-    if (state.pendingScenarioId) {
-      confirmScenario(state.pendingScenarioId);
-    }
+    confirmScenario(state.pendingScenarioId);
     return;
   }
-
   if (state.screenId === "tone") {
     navigateTo("preview", "forward");
     return;
   }
-
   if (state.screenId === "preview") {
     if (state.gifted) {
       navigateTo("journey", "forward");
@@ -570,16 +452,12 @@ function handlePrimaryAction() {
     }
     return;
   }
-
   if (state.screenId === "journey") {
     if (state.checkedStopIds.length >= 2) {
       navigateTo("album", "forward");
-    } else {
-      showToast("この画面でスポットを2つ記録すると、次へ進めます。");
     }
     return;
   }
-
   if (state.screenId === "album") {
     if (state.albumReady) {
       navigateTo("impact", "forward");
@@ -588,10 +466,7 @@ function handlePrimaryAction() {
     }
     return;
   }
-
-  if (state.screenId === "impact") {
-    resetFlow();
-  }
+  resetFlow();
 }
 
 function render(resetScroll = false) {
@@ -611,7 +486,6 @@ function renderChrome() {
   elements.navTitle.textContent = meta.title;
   elements.navBadge.textContent = meta.badge;
   elements.navBack.classList.toggle("hidden", state.screenId === "welcome");
-
   elements.phaseGift.classList.toggle("active", meta.phase === "gift");
   elements.phaseTravel.classList.toggle("active", meta.phase === "travel");
   elements.phaseAfter.classList.toggle("active", meta.phase === "after");
@@ -620,93 +494,83 @@ function renderChrome() {
 function renderScreen() {
   elements.screenView.className = `screen-view ${navDirection === "back" ? "is-back" : "is-forward"}`;
   elements.screenView.innerHTML = renderScreenContent();
-
-  if (state.screenId === "tone" && state.useCustomMessage) {
-    const input = document.getElementById("customMessage");
-    if (input instanceof HTMLInputElement) {
-      input.value = state.customMessage;
-    }
-  }
 }
 
 function renderScreenContent() {
   if (state.screenId === "welcome") {
     return renderWelcomeScreen();
   }
-
   if (state.screenId === "scenario") {
     return renderScenarioScreen();
   }
-
   if (state.screenId === "tone") {
     return renderToneScreen();
   }
-
   if (state.screenId === "preview") {
     return renderPreviewScreen();
   }
-
   if (state.screenId === "journey") {
     return renderJourneyScreen();
   }
-
   if (state.screenId === "album") {
     return renderAlbumScreen();
   }
-
   return renderImpactScreen();
 }
 
 function renderWelcomeScreen() {
   const scenario = currentScenario();
   const region = currentRegion();
-
   return `
-    <section class="hero-card">
-      <p class="eyebrow">Gift a Journey</p>
-      <h2 class="hero-title">大切な人に、<br>旅を贈る。</h2>
-      <p class="hero-copy">選ぶ、贈る、旅するを短い画面で進めるモックです。</p>
-      <div class="hero-metrics">
-        <article class="metric-mini">
-          <strong>3</strong>
-          <span>贈る操作</span>
-        </article>
-        <article class="metric-mini">
-          <strong>2</strong>
-          <span>旅先タップ</span>
-        </article>
-        <article class="metric-mini">
-          <strong>1</strong>
-          <span>自動保存</span>
-        </article>
+    <section class="screen-panel welcome-panel">
+      <div class="panel-head">
+        <p class="panel-label">Gift a Journey</p>
+        <h2 class="welcome-title">大切な人へ<br>旅を贈る</h2>
+        <p class="panel-copy">短い操作で、体験ギフトを送るモックです。</p>
       </div>
-    </section>
-
-    <section class="summary-card">
-      <div class="section-head">
-        <p class="section-label">NEXT</p>
-        <h2>まずは旅を選ぶ</h2>
-        <p class="section-copy">${escapeHtml(scenario.title)} を起点に、${escapeHtml(region.name)} の旅へ入ります。</p>
+      <div class="mini-stats">
+        <article class="mini-stat"><strong>3</strong><span>贈る操作</span></article>
+        <article class="mini-stat"><strong>2</strong><span>旅先タップ</span></article>
+        <article class="mini-stat"><strong>1</strong><span>自動アルバム</span></article>
       </div>
-      <div class="scenario-tags">
-        <span class="tag">${escapeHtml(scenario.recipient)}</span>
-        <span class="tag">${escapeHtml(region.name)}</span>
-        <span class="tag">${escapeHtml(scenario.duration)}</span>
-      </div>
+      <article class="embedded-card route-card">
+        <p class="section-label">おすすめ</p>
+        <h3>${escapeHtml(scenario.title)}</h3>
+        <p class="compact-copy">${escapeHtml(region.tagline)}</p>
+        <div class="tag-row">
+          <span class="tag">${escapeHtml(scenario.recipient)}</span>
+          <span class="tag">${escapeHtml(region.name)}</span>
+          <span class="tag">${escapeHtml(scenario.duration)}</span>
+        </div>
+      </article>
     </section>
   `;
 }
 
 function renderScenarioScreen() {
+  const scenario = pendingScenario();
+  const region = pendingRegion();
   return `
-    <section class="surface-card">
-      <div class="section-head">
-        <p class="section-label">STEP 1</p>
-        <h2>旅を選ぶ</h2>
-        <p class="section-copy">まず「この旅にする」で仮選択して、次に「決定」で次の画面へ進みます。</p>
+    <section class="screen-panel">
+      <div class="panel-head compact-head">
+        <p class="panel-label">STEP 1</p>
+        <p class="panel-copy">候補を選んで、決定します。</p>
       </div>
-      <div class="scenario-list">
-        ${renderScenarioCards()}
+      <article class="embedded-card active-summary">
+        <div class="row-top">
+          <div>
+            <p class="section-label">選択中</p>
+            <h3>${escapeHtml(scenario.title)}</h3>
+          </div>
+          <span class="tag">${escapeHtml(region.name)}</span>
+        </div>
+        <div class="tag-row">
+          <span class="tag">${escapeHtml(scenario.duration)}</span>
+          <span class="tag">${formatCurrency(scenario.budget)}</span>
+        </div>
+      </article>
+      <div class="option-list">
+        ${renderScenarioRows()}
       </div>
     </section>
   `;
@@ -714,71 +578,48 @@ function renderScenarioScreen() {
 
 function renderToneScreen() {
   const scenario = currentScenario();
-  const region = currentRegion();
-
   return `
-    <section class="summary-card">
-      <div class="summary-row">
-        <div>
-          <p class="section-label">SELECTED</p>
-          <h3>${escapeHtml(scenario.title)}</h3>
+    <section class="screen-panel">
+      <div class="panel-head compact-head">
+        <p class="panel-label">STEP 2</p>
+        <p class="panel-copy">${escapeHtml(scenario.title)} に添えるひとことを選びます。</p>
+      </div>
+      <article class="embedded-card slim-card">
+        <div class="tag-row">
+          <span class="tag">${escapeHtml(scenario.recipient)}</span>
+          <span class="tag">${escapeHtml(scenario.occasion)}</span>
         </div>
-        <span class="tag">${escapeHtml(region.name)}</span>
-      </div>
-      <p class="summary-copy">${escapeHtml(region.tagline)}</p>
-      <div class="scenario-tags">
-        <span class="tag">${escapeHtml(scenario.duration)}</span>
-        <span class="tag">${formatCurrency(scenario.budget)}</span>
-      </div>
-    </section>
-
-    <section class="surface-card">
-      <div class="section-head">
-        <p class="section-label">STEP 2</p>
-        <h2>気持ちを選ぶ</h2>
-        <p class="section-copy">ひとことをタップするだけで贈れます。</p>
-      </div>
-      <div class="tone-grid">
-        ${renderToneButtons()}
-      </div>
-      <button class="text-button" type="button" data-action="toggle-custom">
-        ${state.useCustomMessage ? "プリセットのひとことに戻す" : "自分の言葉を少しだけ足す"}
-      </button>
-      <label class="custom-message ${state.useCustomMessage ? "" : "hidden"}">
-        <span class="field-label">任意のひとこと</span>
-        <input id="customMessage" type="text" maxlength="40" placeholder="例: 次は一緒に行こうね" value="${escapeHtml(state.customMessage)}">
-      </label>
-      <p class="quote-copy">「${escapeHtml(resolvedMessage())}」</p>
+        <div class="tone-grid">
+          ${renderToneButtons()}
+        </div>
+        <button class="text-button" type="button" data-action="toggle-custom">
+          ${state.useCustomMessage ? "プリセットに戻す" : "自分の言葉を足す"}
+        </button>
+        <label class="custom-message ${state.useCustomMessage ? "" : "hidden"}">
+          <input id="customMessage" type="text" maxlength="36" placeholder="例: 次は一緒に行こうね" value="${escapeHtml(state.customMessage)}">
+        </label>
+      </article>
+      <article class="quote-box">「${escapeHtml(resolvedMessage())}」</article>
     </section>
   `;
 }
 
 function renderPreviewScreen() {
-  const scenario = currentScenario();
   const region = currentRegion();
-
   return `
-    <section class="surface-card">
-      <div class="section-head">
-        <p class="section-label">PREVIEW</p>
-        <h2>届くギフト</h2>
-        <p class="section-copy">贈る前に、届く内容だけ確認します。</p>
+    <section class="screen-panel">
+      <div class="panel-head compact-head">
+        <p class="panel-label">PREVIEW</p>
+        <p class="panel-copy">贈る前の確認だけを表示します。</p>
       </div>
       ${renderGiftCard()}
-      <div class="detail-grid">
-        <article class="detail-item">
-          <strong>地域体験</strong>
-          <span>${escapeHtml(region.style)}</span>
-        </article>
-        <article class="detail-item">
-          <strong>旅先の記録</strong>
-          <span>チェックインで自動保存</span>
-        </article>
-        <article class="detail-item">
-          <strong>旅のあと</strong>
-          <span>アルバムと地域ECへ接続</span>
-        </article>
-      </div>
+      <article class="embedded-card slim-card">
+        <div class="mini-list">
+          <div class="mini-row"><strong>旅先</strong><span>${escapeHtml(region.name)}</span></div>
+          <div class="mini-row"><strong>記録</strong><span>旅先で2回タップ</span></div>
+          <div class="mini-row"><strong>旅のあと</strong><span>アルバム化</span></div>
+        </div>
+      </article>
     </section>
   `;
 }
@@ -787,77 +628,51 @@ function renderJourneyScreen() {
   const scenario = currentScenario();
   const region = currentRegion();
   const remaining = Math.max(0, 2 - state.checkedStopIds.length);
-
   return `
-    <section class="journey-banner">
-      <p class="section-label">TRAVELER SCREEN</p>
-      <h3>${escapeHtml(scenario.recipient)}が旅先でタップすると、体験ログがそのまま残ります。</h3>
-      <p class="journey-summary">${remaining > 0 ? `あと${remaining}スポット記録すると、旅アルバムへ進めます。` : "2スポットそろったので、次は旅アルバムです。"}</p>
-      <div class="scenario-tags">
-        <span class="banner-chip">${escapeHtml(region.name)}</span>
-        <span class="banner-chip">${escapeHtml(region.style)}</span>
+    <section class="screen-panel">
+      <div class="panel-head compact-head">
+        <p class="panel-label">TRAVEL</p>
+        <p class="panel-copy">${escapeHtml(scenario.recipient)} が旅先で記録する画面です。</p>
       </div>
-    </section>
-
-    <section class="surface-card">
-      <div class="section-head">
-        <p class="section-label">CHECK IN</p>
-        <h2>旅先で記録する</h2>
-        <p class="section-copy">この画面では、立ち寄った場所をタップするだけです。</p>
-      </div>
-      <div class="stop-list">
-        ${renderStopCards()}
+      <article class="embedded-card slim-card">
+        <div class="row-top">
+          <div>
+            <p class="section-label">進行</p>
+            <h3>${remaining > 0 ? `あと${remaining}スポット` : "アルバムへ進めます"}</h3>
+          </div>
+          <span class="tag">${escapeHtml(region.name)}</span>
+        </div>
+        <div class="progress-bar"><span style="width:${Math.min(100, state.checkedStopIds.length * 50)}%"></span></div>
+      </article>
+      <div class="compact-list">
+        ${renderStopRows()}
       </div>
     </section>
   `;
 }
 
 function renderAlbumScreen() {
-  const scenario = currentScenario();
   const region = currentRegion();
   const stops = checkedStops();
-
-  let albumBody = `
-    <article class="album-box">
-      <h3>${escapeHtml(scenario.recipient)}の旅が育っています</h3>
-      <p class="album-copy">2つの体験がそろうと、自動で旅アルバムをつくれます。</p>
-      <div class="album-empty">
-        ${stops.map((stop, index) => `
-          <div class="album-photo" style="background:${region.albumGradients[index % region.albumGradients.length]}">
-            ${escapeHtml(stop.name)}<br>${escapeHtml(stop.note)}
-          </div>
-        `).join("")}
-        ${Array.from({ length: Math.max(0, 2 - stops.length) }).map(() => `
-          <div class="album-placeholder"></div>
-        `).join("")}
+  return `
+    <section class="screen-panel">
+      <div class="panel-head compact-head">
+        <p class="panel-label">ALBUM</p>
+        <p class="panel-copy">${state.albumReady ? "旅の記録が1冊にまとまりました。" : "2つそろうとアルバムになります。"}</p>
       </div>
-    </article>
-  `;
-
-  if (state.albumReady) {
-    albumBody = `
-      <article class="album-box">
-        <h3>${escapeHtml(region.name)}の旅アルバム</h3>
-        <p class="album-copy">${escapeHtml(resolvedMessage())}</p>
-        <div class="album-photos">
-          ${stops.map((stop, index) => `
-            <div class="album-photo" style="background:${region.albumGradients[index % region.albumGradients.length]}">
-              ${escapeHtml(stop.name)}<br>${escapeHtml(stop.note)}
+      <article class="embedded-card album-card">
+        <div class="album-grid">
+          ${stops.slice(0, 2).map((stop, index) => `
+            <div class="album-tile" style="background:${region.albumGradients[index % region.albumGradients.length]}">
+              <span>${escapeHtml(stop.name)}</span>
             </div>
           `).join("")}
+          ${Array.from({ length: Math.max(0, 2 - stops.length) }).map(() => `
+            <div class="album-empty">旅の記録</div>
+          `).join("")}
         </div>
+        <p class="compact-copy">${state.albumReady ? escapeHtml(resolvedMessage()) : "旅先で記録された体験がここに並びます。"}</p>
       </article>
-    `;
-  }
-
-  return `
-    <section class="surface-card">
-      <div class="section-head">
-        <p class="section-label">ALBUM</p>
-        <h2>旅アルバム</h2>
-        <p class="section-copy">${state.albumReady ? "旅の記録が1冊にまとまりました。" : "記録された体験が、自動でアルバムになっていきます。"}</p>
-      </div>
-      ${albumBody}
     </section>
   `;
 }
@@ -865,64 +680,42 @@ function renderAlbumScreen() {
 function renderImpactScreen() {
   const region = currentRegion();
   const spend = checkedStops().reduce((total, stop) => total + stop.spend, 0);
-  const checkedCount = state.checkedStopIds.length;
   const ecPotential = Math.round(spend * 0.28);
-
   return `
-    <section class="surface-card">
-      <div class="section-head">
-        <p class="section-label">REGIONAL VALUE</p>
-        <h2>地域に返る価値</h2>
-        <p class="section-copy">旅の体験が記録になることで、回遊、消費、旅後ECまで見えるようになります。</p>
+    <section class="screen-panel">
+      <div class="panel-head compact-head">
+        <p class="panel-label">REGION</p>
+        <p class="panel-copy">旅の体験が、地域の価値にも返っていきます。</p>
       </div>
-      <div class="metric-list">
-        <article class="metric-card">
-          <p class="section-label">回遊</p>
-          <h3>チェックイン数</h3>
-          <p class="metric-value">${checkedCount}/${currentRegion().stops.length}</p>
-          <p>定番スポットだけでなく、地域内の回遊を後押しします。</p>
-        </article>
-        <article class="metric-card">
-          <p class="section-label">地域消費</p>
-          <h3>今回の消費額</h3>
-          <p class="metric-value">${formatCurrency(spend)}</p>
-          <p>小さな事業者にも届く使われ方が見える設計です。</p>
-        </article>
-        <article class="metric-card">
-          <p class="section-label">旅後EC</p>
-          <h3>次の購入余地</h3>
-          <p class="metric-value">+${formatCurrency(ecPotential)}</p>
-          <p>${escapeHtml(region.ecLabel)}</p>
-        </article>
+      <div class="stats-grid">
+        <article class="stat-card"><span>回遊</span><strong>${state.checkedStopIds.length}/${currentRegion().stops.length}</strong></article>
+        <article class="stat-card"><span>消費</span><strong>${formatCurrency(spend)}</strong></article>
+        <article class="stat-card"><span>旅後EC</span><strong>+${formatCurrency(ecPotential)}</strong></article>
       </div>
-      <button class="secondary-button" type="button" data-action="restart">もう一度はじめから見る</button>
+      <article class="embedded-card slim-card">
+        <p class="compact-copy">${escapeHtml(region.ecLabel)}</p>
+        <button class="text-button" type="button" data-action="restart">最初から見る</button>
+      </article>
     </section>
   `;
 }
 
-function renderScenarioCards() {
+function renderScenarioRows() {
   return scenarios.map((scenario) => `
-    <article class="scenario-card ${scenario.id === state.pendingScenarioId ? "active" : ""}">
-      <div class="scenario-top">
-        <div>
-          <p class="section-label">${escapeHtml(scenario.badge)}</p>
-          <h3>${escapeHtml(scenario.title)}</h3>
+    <article class="option-row ${scenario.id === state.pendingScenarioId ? "selected" : ""}">
+      <div class="option-main">
+        <div class="row-top">
+          <div>
+            <p class="section-label">${escapeHtml(scenario.badge)}</p>
+            <h3>${escapeHtml(scenario.title)}</h3>
+          </div>
+          <span class="tag">${escapeHtml(regions[scenario.regionId].name)}</span>
         </div>
-        <span class="tag">${escapeHtml(regions[scenario.regionId].name)}</span>
+        <p class="compact-copy">${escapeHtml(scenario.summary)}</p>
       </div>
-      <p class="scenario-copy">${escapeHtml(scenario.summary)}</p>
-      <div class="scenario-tags">
-        <span class="tag">${escapeHtml(scenario.duration)}</span>
-        <span class="tag">${formatCurrency(scenario.budget)}</span>
-        ${scenario.id === state.scenarioId ? '<span class="tag">現在の確定</span>' : ""}
-      </div>
-      <div class="card-actions">
-        <button class="select-button ${scenario.id === state.pendingScenarioId ? "active" : ""}" type="button" data-scenario-id="${scenario.id}">
-          この旅にする
-        </button>
-        <button class="secondary-button dark confirm-button" type="button" data-confirm-scenario-id="${scenario.id}" ${scenario.id === state.pendingScenarioId ? "" : "disabled"}>
-          決定
-        </button>
+      <div class="row-actions">
+        <button class="select-button ${scenario.id === state.pendingScenarioId ? "active" : ""}" type="button" data-scenario-id="${scenario.id}">この旅にする</button>
+        <button class="confirm-button" type="button" data-confirm-scenario-id="${scenario.id}" ${scenario.id === state.pendingScenarioId ? "" : "disabled"}>決定</button>
       </div>
     </article>
   `).join("");
@@ -939,19 +732,18 @@ function renderToneButtons() {
 function renderGiftCard() {
   const scenario = currentScenario();
   const region = currentRegion();
-
   return `
-    <article class="gift-card" style="background:${region.gradient}" aria-live="polite">
-      <div class="card-top">
+    <article class="gift-card" style="background:${region.gradient}">
+      <div class="row-top">
         <span class="tag">${escapeHtml(scenario.occasion)}</span>
         <span class="card-id">${escapeHtml(region.name)}</span>
       </div>
-      <div>
+      <div class="gift-copy">
         <p class="card-note">${escapeHtml(region.tagline)}</p>
         <h3 class="card-title">${escapeHtml(scenario.recipient)}へ贈る旅</h3>
         <p class="card-message">${escapeHtml(resolvedMessage())}</p>
       </div>
-      <div class="card-chip-list">
+      <div class="tag-row">
         <span class="card-chip">${escapeHtml(region.style)}</span>
         <span class="card-chip">${escapeHtml(scenario.duration)}</span>
         <span class="card-chip">${formatCurrency(scenario.budget)}</span>
@@ -960,26 +752,24 @@ function renderGiftCard() {
   `;
 }
 
-function renderStopCards() {
+function renderStopRows() {
   const region = currentRegion();
   return region.stops.map((stop) => {
     const checked = state.checkedStopIds.includes(stop.id);
     return `
-      <article class="stop-card ${checked ? "checked" : ""}">
-        <div class="stop-top">
-          <div>
-            <p class="section-label">${escapeHtml(stop.type)}</p>
-            <h3>${escapeHtml(stop.name)}</h3>
+      <article class="option-row ${checked ? "checked" : ""}">
+        <div class="option-main">
+          <div class="row-top">
+            <div>
+              <p class="section-label">${escapeHtml(stop.type)}</p>
+              <h3>${escapeHtml(stop.name)}</h3>
+            </div>
+            <span class="tag">${formatCurrency(stop.spend)}</span>
           </div>
-          <span class="tag">${formatCurrency(stop.spend)}</span>
+          <p class="compact-copy">${escapeHtml(stop.note)}</p>
         </div>
-        <p>${escapeHtml(stop.note)}</p>
-        <div class="stop-meta">
-          <span class="tag">${escapeHtml(region.name)}</span>
-          <span class="tag">${checked ? "記録済み" : "未記録"}</span>
-        </div>
-        <button class="check-button" type="button" data-stop-id="${stop.id}" ${checked ? "disabled" : ""}>
-          ${checked ? "記録済み" : "ここでチェックイン"}
+        <button class="confirm-button ${checked ? "done" : ""}" type="button" data-stop-id="${stop.id}" ${checked ? "disabled" : ""}>
+          ${checked ? "記録済み" : "チェックイン"}
         </button>
       </article>
     `;
@@ -995,65 +785,29 @@ function renderAction() {
 
 function primaryActionState() {
   if (state.screenId === "welcome") {
-    return {
-      copy: "まずは旅を選びます。",
-      label: "旅を選ぶ",
-      disabled: false
-    };
+    return { copy: "まずは旅を選びます。", label: "はじめる", disabled: false };
   }
-
   if (state.screenId === "scenario") {
-    return {
-      copy: "選んで決定します。",
-      label: "決定して次へ",
-      disabled: false
-    };
+    return { copy: "選んで決定します。", label: "決定して次へ", disabled: false };
   }
-
   if (state.screenId === "tone") {
-    return {
-      copy: "ひとことを選びます。",
-      label: "ギフトを確認する",
-      disabled: false
-    };
+    return { copy: "ひとことを選びます。", label: "確認へ", disabled: false };
   }
-
   if (state.screenId === "preview") {
     return {
-      copy: state.gifted
-        ? "旅先の画面へ進めます。"
-        : "内容を確認して贈ります。",
-      label: state.gifted ? "旅先の画面へ" : "この旅を贈る",
+      copy: state.gifted ? "旅行者の画面へ進みます。" : "内容を確認して贈ります。",
+      label: state.gifted ? "旅先へ" : "この旅を贈る",
       disabled: false
     };
   }
-
   if (state.screenId === "journey") {
     const ready = state.checkedStopIds.length >= 2;
-    return {
-      copy: ready
-        ? "アルバムへ進めます。"
-        : "2スポット記録します。",
-      label: ready ? "旅アルバムへ" : "あと少しで次へ",
-      disabled: !ready
-    };
+    return { copy: ready ? "次はアルバムです。" : "2つ記録すると次へ進みます。", label: ready ? "アルバムへ" : "記録を待つ", disabled: !ready };
   }
-
   if (state.screenId === "album") {
-    return {
-      copy: state.albumReady
-        ? "最後に地域価値を見ます。"
-        : "アルバムを仕上げます。",
-      label: state.albumReady ? "地域へのひろがりへ" : "旅アルバムをつくる",
-      disabled: !state.albumReady && state.checkedStopIds.length < 2
-    };
+    return { copy: state.albumReady ? "最後に地域価値を見ます。" : "アルバムをつくります。", label: state.albumReady ? "地域価値へ" : "アルバムをつくる", disabled: !state.albumReady && state.checkedStopIds.length < 2 };
   }
-
-  return {
-    copy: "最初の画面に戻れます。",
-    label: "最初から見る",
-    disabled: false
-  };
+  return { copy: "最初に戻れます。", label: "最初から見る", disabled: false };
 }
 
 function showToast(message) {
@@ -1062,7 +816,7 @@ function showToast(message) {
   elements.toast.classList.add("show");
   toastTimer = window.setTimeout(() => {
     elements.toast.classList.remove("show");
-  }, 2200);
+  }, 1800);
 }
 
 function showCelebration(title, message) {
@@ -1073,7 +827,7 @@ function showCelebration(title, message) {
   elements.celebration.setAttribute("aria-hidden", "false");
   celebrationTimer = window.setTimeout(() => {
     hideCelebration();
-  }, 2600);
+  }, 2200);
 }
 
 function hideCelebration() {
