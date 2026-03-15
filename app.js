@@ -665,42 +665,33 @@ function renderWelcomeScreen() {
     <section class="hero-card">
       <p class="eyebrow">Gift a Journey</p>
       <h2 class="hero-title">大切な人に、<br>旅を贈る。</h2>
-      <p class="hero-copy">今度は1画面ずつ進むモックです。選ぶ、贈る、旅する、残すをアプリっぽく体験できます。</p>
+      <p class="hero-copy">選ぶ、贈る、旅するを短い画面で進めるモックです。</p>
       <div class="hero-metrics">
         <article class="metric-mini">
           <strong>3</strong>
-          <span>送り主の操作</span>
+          <span>贈る操作</span>
         </article>
         <article class="metric-mini">
           <strong>2</strong>
-          <span>旅先のタップ</span>
+          <span>旅先タップ</span>
         </article>
         <article class="metric-mini">
           <strong>1</strong>
-          <span>自動アルバム</span>
+          <span>自動保存</span>
         </article>
       </div>
     </section>
 
-    <section class="surface-card">
+    <section class="summary-card">
       <div class="section-head">
         <p class="section-label">NEXT</p>
         <h2>まずは旅を選ぶ</h2>
-        <p class="section-copy">いまのおすすめは、${escapeHtml(scenario.title)}。${escapeHtml(region.name)} の空気感から始められます。</p>
+        <p class="section-copy">${escapeHtml(scenario.title)} を起点に、${escapeHtml(region.name)} の旅へ入ります。</p>
       </div>
-      <div class="detail-grid">
-        <article class="detail-item">
-          <strong>贈る相手</strong>
-          <span>${escapeHtml(scenario.recipient)}</span>
-        </article>
-        <article class="detail-item">
-          <strong>旅先</strong>
-          <span>${escapeHtml(region.name)}</span>
-        </article>
-        <article class="detail-item">
-          <strong>旅の長さ</strong>
-          <span>${escapeHtml(scenario.duration)}</span>
-        </article>
+      <div class="scenario-tags">
+        <span class="tag">${escapeHtml(scenario.recipient)}</span>
+        <span class="tag">${escapeHtml(region.name)}</span>
+        <span class="tag">${escapeHtml(scenario.duration)}</span>
       </div>
     </section>
   `;
@@ -745,7 +736,7 @@ function renderToneScreen() {
       <div class="section-head">
         <p class="section-label">STEP 2</p>
         <h2>気持ちを選ぶ</h2>
-        <p class="section-copy">文章は打たなくても大丈夫。ひとことをタップするだけで贈れます。</p>
+        <p class="section-copy">ひとことをタップするだけで贈れます。</p>
       </div>
       <div class="tone-grid">
         ${renderToneButtons()}
@@ -757,10 +748,6 @@ function renderToneScreen() {
         <span class="field-label">任意のひとこと</span>
         <input id="customMessage" type="text" maxlength="40" placeholder="例: 次は一緒に行こうね" value="${escapeHtml(state.customMessage)}">
       </label>
-    </section>
-
-    <section class="message-card">
-      <p class="section-label">MESSAGE PREVIEW</p>
       <p class="quote-copy">「${escapeHtml(resolvedMessage())}」</p>
     </section>
   `;
@@ -775,19 +762,9 @@ function renderPreviewScreen() {
       <div class="section-head">
         <p class="section-label">PREVIEW</p>
         <h2>届くギフト</h2>
-        <p class="section-copy">送り主の気持ちと旅先の空気が、1枚のカードとして届きます。</p>
+        <p class="section-copy">贈る前に、届く内容だけ確認します。</p>
       </div>
       ${renderGiftCard()}
-    </section>
-
-    <section class="summary-card">
-      <div class="summary-row">
-        <div>
-          <p class="section-label">DELIVERY</p>
-          <h3>${escapeHtml(scenario.recipient)}に届く内容</h3>
-        </div>
-        <span class="tag">${escapeHtml(scenario.occasion)}</span>
-      </div>
       <div class="detail-grid">
         <article class="detail-item">
           <strong>地域体験</strong>
@@ -1019,7 +996,7 @@ function renderAction() {
 function primaryActionState() {
   if (state.screenId === "welcome") {
     return {
-      copy: "まずはギフトにする旅を選びます。",
+      copy: "まずは旅を選びます。",
       label: "旅を選ぶ",
       disabled: false
     };
@@ -1027,7 +1004,7 @@ function primaryActionState() {
 
   if (state.screenId === "scenario") {
     return {
-      copy: "「この旅にする」で選び、「決定」で次の画面へ進みます。",
+      copy: "選んで決定します。",
       label: "決定して次へ",
       disabled: false
     };
@@ -1035,7 +1012,7 @@ function primaryActionState() {
 
   if (state.screenId === "tone") {
     return {
-      copy: "ことばが決まったら、届くギフトを確認できます。",
+      copy: "ひとことを選びます。",
       label: "ギフトを確認する",
       disabled: false
     };
@@ -1044,8 +1021,8 @@ function primaryActionState() {
   if (state.screenId === "preview") {
     return {
       copy: state.gifted
-        ? "このまま受け取った人の画面へ進めます。"
-        : "送り主の操作はここで完了です。",
+        ? "旅先の画面へ進めます。"
+        : "内容を確認して贈ります。",
       label: state.gifted ? "旅先の画面へ" : "この旅を贈る",
       disabled: false
     };
@@ -1055,8 +1032,8 @@ function primaryActionState() {
     const ready = state.checkedStopIds.length >= 2;
     return {
       copy: ready
-        ? "2つの体験が記録されたので、旅アルバムへ進めます。"
-        : "この画面でスポットを2つタップすると次へ進めます。",
+        ? "アルバムへ進めます。"
+        : "2スポット記録します。",
       label: ready ? "旅アルバムへ" : "あと少しで次へ",
       disabled: !ready
     };
@@ -1065,15 +1042,15 @@ function primaryActionState() {
   if (state.screenId === "album") {
     return {
       copy: state.albumReady
-        ? "旅の記録がまとまりました。最後に地域への広がりを見ます。"
-        : "この画面で旅アルバムを完成させます。",
+        ? "最後に地域価値を見ます。"
+        : "アルバムを仕上げます。",
       label: state.albumReady ? "地域へのひろがりへ" : "旅アルバムをつくる",
       disabled: !state.albumReady && state.checkedStopIds.length < 2
     };
   }
 
   return {
-    copy: "最初の画面に戻って、もう一度体験できます。",
+    copy: "最初の画面に戻れます。",
     label: "最初から見る",
     disabled: false
   };
