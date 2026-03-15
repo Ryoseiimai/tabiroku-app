@@ -1,0 +1,11 @@
+﻿更新日時,コミット,更新タイトル,主な更新内容,変更ファイル,ユーザーに見える変化,公開URL
+2026-03-15 13:55,702f71e,Remove user-facing impact screen,地域価値ダッシュボードを導線から外し、アルバムで完了する流れに変更。,app.js,最後がユーザー向けの完了画面として自然になった。,https://ryoseiimai.github.io/tabiroku-app/
+2026-03-15 13:53,4c74fd8,Clarify journey recording flow,旅先ログをトグル記録にし、アルバムへつながる説明文を改善。,app.js,押し間違いを戻しやすく、次の画面も理解しやすくなった。,https://ryoseiimai.github.io/tabiroku-app/
+2026-03-15 13:50,eb53459,Refine ask-first mobile flow,おすすめ先行ではなく、相手・したい時間・要望入力から旅提案する流れに変更。,"app.js, styles.css",相談してから旅が提案される体験に変わった。,https://ryoseiimai.github.io/tabiroku-app/
+2026-03-15 12:42,0cd3250,Refine compact screen-first mock,iPhone アプリらしい見た目と操作導線になるよう再調整。,"app.js, styles.css",よりスマホアプリっぽい印象に更新。,https://ryoseiimai.github.io/tabiroku-app/
+2026-03-15 12:31,3ea4570,Compact mobile screens,余白、文字量、カードの高さを削って画面密度を調整。,"app.js, styles.css",スクロールを減らしたコンパクト UI に改善。,https://ryoseiimai.github.io/tabiroku-app/
+2026-03-15 12:23,9516885,Add scenario confirmation step,旅候補を仮選択してから決定する、2段階の選択操作を追加。,"app.js, styles.css",誤タップしづらい旅選択になった。,https://ryoseiimai.github.io/tabiroku-app/
+2026-03-15 12:19,6e43899,Convert mock to screen-based mobile flow,長い1ページ構成をやめて、画面遷移型のスマホモックへ変更。,"app.js, index.html, styles.css",ポチポチ進めるアプリ風の体験に変更。,https://ryoseiimai.github.io/tabiroku-app/
+2026-03-15 12:09,8417a0a,Remove Pages workflow for initial push,GitHub Pages の公開方法を workflow からブランチ公開へ切り替えた。,.github/workflows/pages.yml,公開 URL を安定して使える状態に調整。,https://ryoseiimai.github.io/tabiroku-app/
+2026-03-15 12:08,ced69ab,Ignore local GitHub CLI files,ローカルの GitHub CLI 関連ファイルを git 管理対象から外した。,.gitignore,ユーザー画面の変化なし。,https://ryoseiimai.github.io/tabiroku-app/
+2026-03-15 11:33,123d0a6,Initial Tabiroku mobile mock,旅録モックの初期画面と、ギフト・旅ログの基本構成を追加。,".github/workflows/pages.yml, .gitignore, README.md, app.js",最初のスマホモックを確認できる状態に。,https://ryoseiimai.github.io/tabiroku-app/
