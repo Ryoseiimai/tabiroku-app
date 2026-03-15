@@ -487,13 +487,27 @@ function giftTrip() {
 }
 
 function checkIn(stopId) {
-  if (!state.gifted || state.checkedStopIds.includes(stopId)) {
+  if (!state.gifted) {
     return;
   }
+
+  if (state.checkedStopIds.includes(stopId)) {
+    state.checkedStopIds = state.checkedStopIds.filter((id) => id !== stopId);
+    saveState();
+    render();
+    showToast("記録を戻しました。");
+    return;
+  }
+
+  if (state.checkedStopIds.length >= 2) {
+    showToast("このモックでは2つまで選べます。");
+    return;
+  }
+
   state.checkedStopIds.push(stopId);
   saveState();
   render();
-  showToast(state.checkedStopIds.length >= 2 ? "次はアルバムです。" : "1つ記録しました。");
+  showToast(state.checkedStopIds.length >= 2 ? "次は旅アルバムです。" : "1つ記録しました。");
 }
 
 function buildAlbum() {
@@ -764,11 +778,12 @@ function renderJourneyScreen() {
         <div class="row-top">
           <div>
             <p class="section-label">進行</p>
-            <h3>${remaining > 0 ? `あと${remaining}スポット` : "アルバムへ進めます"}</h3>
+            <h3>${remaining > 0 ? `あと${remaining}つ記録` : "2つそろいました"}</h3>
           </div>
           <span class="tag">${escapeHtml(region.name)}</span>
         </div>
         <div class="progress-bar"><span style="width:${Math.min(100, state.checkedStopIds.length * 50)}%"></span></div>
+        <p class="compact-copy">${remaining > 0 ? "2つ記録すると、次の画面でこの2つが旅アルバムになります。" : "次の画面で、この2つを1枚の旅アルバムにまとめます。"}</p>
       </article>
       <div class="compact-list">
         ${renderStopRows()}
@@ -784,7 +799,7 @@ function renderAlbumScreen() {
     <section class="screen-panel">
       <div class="panel-head compact-head">
         <p class="panel-label">記録</p>
-        <p class="panel-copy">${state.albumReady ? "旅の記録が1冊にまとまりました。" : "2つそろうとアルバムになります。"}</p>
+        <p class="panel-copy">${state.albumReady ? "選んだ2つが1冊にまとまりました。" : "選んだ2つを、この画面で1冊にまとめます。"}</p>
       </div>
       <article class="embedded-card album-card">
         <div class="album-grid">
@@ -797,7 +812,7 @@ function renderAlbumScreen() {
             <div class="album-empty">旅の記録</div>
           `).join("")}
         </div>
-        <p class="compact-copy">${state.albumReady ? escapeHtml(resolvedMessage()) : "相談内容と旅先の体験がここに並びます。"}</p>
+        <p class="compact-copy">${state.albumReady ? escapeHtml(resolvedMessage()) : "相談内容と旅先で押した2つの記録が、ここで並びます。"}</p>
       </article>
     </section>
   `;
@@ -889,8 +904,8 @@ function renderStopRows() {
           </div>
           <p class="compact-copy">${escapeHtml(stop.note)}</p>
         </div>
-        <button class="confirm-button ${checked ? "done" : ""}" type="button" data-stop-id="${stop.id}" ${checked ? "disabled" : ""}>
-          ${checked ? "記録済み" : "チェックイン"}
+        <button class="confirm-button ${checked ? "done" : ""}" type="button" data-stop-id="${stop.id}">
+          ${checked ? "記録を戻す" : "記録する"}
         </button>
       </article>
     `;
@@ -923,7 +938,11 @@ function primaryActionState() {
   }
   if (state.screenId === "journey") {
     const ready = state.checkedStopIds.length >= 2;
-    return { copy: ready ? "次はアルバムです。" : "2つ記録すると次へ進みます。", label: ready ? "アルバムへ" : "記録を待つ", disabled: !ready };
+    return {
+      copy: ready ? "次の画面で、選んだ2つが旅アルバムになります。" : "まずは旅先で2つ記録します。",
+      label: ready ? "旅アルバムへ" : "記録を待つ",
+      disabled: !ready
+    };
   }
   if (state.screenId === "album") {
     return { copy: state.albumReady ? "最後に地域価値を見ます。" : "アルバムをつくります。", label: state.albumReady ? "地域価値へ" : "アルバムをつくる", disabled: !state.albumReady && state.checkedStopIds.length < 2 };
