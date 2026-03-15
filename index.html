@@ -22,77 +22,23 @@
       </div>
       <div class="dynamic-island" aria-hidden="true"></div>
 
-      <header class="hero-panel">
-        <p class="eyebrow">Gift a Journey</p>
-        <h1>大切な人に、<br>旅を贈る。</h1>
-        <p class="hero-copy">やることは3つだけ。旅を選んで、気持ちを選んで、贈る。</p>
-        <div class="hero-steps" aria-label="旅録の流れ">
-          <span class="step-pill active" id="stepGift">1 選ぶ</span>
-          <span class="step-pill" id="stepTravel">2 旅する</span>
-          <span class="step-pill" id="stepAfter">3 残す</span>
+      <header class="nav-bar">
+        <button class="nav-button hidden" id="navBack" type="button" aria-label="前の画面へ">‹</button>
+        <div class="nav-copy">
+          <p class="eyebrow" id="navEyebrow">Gift a Journey</p>
+          <h1 id="navTitle">旅録</h1>
         </div>
+        <div class="nav-badge" id="navBadge">送り主</div>
       </header>
 
-      <main class="app-main">
-        <section class="surface-card">
-          <div class="section-head">
-            <p class="section-label">STEP 1</p>
-            <h2>旅を選ぶ</h2>
-            <p class="section-copy">おすすめの物語からひとつ選ぶだけです。</p>
-          </div>
-          <div class="scenario-list" id="scenarioList"></div>
-        </section>
+      <div class="phase-strip" aria-label="旅録の流れ">
+        <span class="phase-pill active" id="phaseGift">贈る</span>
+        <span class="phase-pill" id="phaseTravel">旅する</span>
+        <span class="phase-pill" id="phaseAfter">残す</span>
+      </div>
 
-        <section class="surface-card">
-          <div class="section-head">
-            <p class="section-label">STEP 2</p>
-            <h2>気持ちを選ぶ</h2>
-            <p class="section-copy">文章は打たなくても大丈夫。ひとことで贈れます。</p>
-          </div>
-          <div class="tone-grid" id="toneList"></div>
-          <button class="text-button" id="toggleCustomMessage" type="button">自分の言葉を少しだけ足す</button>
-          <label class="custom-message hidden" id="customMessageField">
-            <span class="field-label">任意のひとこと</span>
-            <input id="customMessage" type="text" maxlength="40" placeholder="例: 次は一緒に行こうね">
-          </label>
-        </section>
-
-        <section class="surface-card preview-card">
-          <div class="section-head">
-            <p class="section-label">PREVIEW</p>
-            <h2>届くギフト</h2>
-            <p class="section-copy">贈る前に、相手に届く旅の雰囲気が見えます。</p>
-          </div>
-          <article class="gift-card" id="giftCard" aria-live="polite"></article>
-        </section>
-
-        <section class="surface-card" id="journeyPanel">
-          <div class="section-head">
-            <p class="section-label">STEP 3</p>
-            <h2>旅先でタップする</h2>
-            <p class="section-copy" id="journeySummary"></p>
-          </div>
-          <div class="journey-banner" id="journeyBanner"></div>
-          <div class="stop-list" id="stopList"></div>
-        </section>
-
-        <section class="surface-card">
-          <div class="section-head">
-            <p class="section-label">ALBUM</p>
-            <h2>旅アルバム</h2>
-            <p class="section-copy">2つチェックインすると、自動で思い出がまとまります。</p>
-          </div>
-          <div id="albumPanel"></div>
-        </section>
-
-        <section class="surface-card" id="impactPanel">
-          <div class="section-head">
-            <p class="section-label">REGIONAL VALUE</p>
-            <h2>地域に返る価値</h2>
-            <p class="section-copy" id="impactNote"></p>
-          </div>
-          <div class="metric-list" id="metricList"></div>
-        </section>
+      <main class="screen-shell" id="screenShell">
+        <div class="screen-view is-forward" id="screenView" aria-live="polite"></div>
       </main>
 
       <footer class="action-sheet">
@@ -102,6 +48,7 @@
         </div>
         <button class="primary-button" id="primaryAction" type="button"></button>
       </footer>
+
       <div class="home-indicator" aria-hidden="true"></div>
     </div>
   </div>
