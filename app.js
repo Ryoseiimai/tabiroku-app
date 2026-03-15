@@ -1,6 +1,6 @@
 const STORAGE_KEY = "tabiroku-mobile-screens-v3";
 
-const screenOrder = ["welcome", "scenario", "tone", "preview", "journey", "album", "impact"];
+const screenOrder = ["welcome", "scenario", "tone", "preview", "journey", "album"];
 
 const screenMeta = {
   welcome: { eyebrow: "相談", title: "旅の相談", badge: "送り主", phase: "gift" },
@@ -8,8 +8,7 @@ const screenMeta = {
   tone: { eyebrow: "贈る", title: "届け方", badge: "送り主", phase: "gift" },
   preview: { eyebrow: "確認", title: "ギフト確認", badge: "送り主", phase: "gift" },
   journey: { eyebrow: "旅先", title: "旅先ログ", badge: "旅行者", phase: "travel" },
-  album: { eyebrow: "記録", title: "アルバム", badge: "旅行者", phase: "after" },
-  impact: { eyebrow: "地域", title: "地域価値", badge: "地域", phase: "after" }
+  album: { eyebrow: "記録", title: "アルバム", badge: "旅行者", phase: "after" }
 };
 
 const recipientOptions = [
@@ -280,6 +279,9 @@ function bindEvents() {
 }
 
 function sanitizeState() {
+  if (state.screenId === "impact") {
+    state.screenId = "album";
+  }
   if (!screenOrder.includes(state.screenId)) {
     state.screenId = defaultState.screenId;
   }
@@ -308,16 +310,12 @@ function sanitizeState() {
   if (!state.gifted) {
     state.checkedStopIds = [];
     state.albumReady = false;
-    if (["journey", "album", "impact"].includes(state.screenId)) {
+    if (["journey", "album"].includes(state.screenId)) {
       state.screenId = "preview";
     }
   }
-
   if (state.checkedStopIds.length < 2) {
     state.albumReady = false;
-    if (state.screenId === "impact") {
-      state.screenId = "album";
-    }
   }
 }
 
@@ -535,14 +533,14 @@ function navigateTo(screenId, direction = "forward") {
 }
 
 function sanitizeScreenId(screenId) {
+  if (screenId === "impact") {
+    return "album";
+  }
   if (!screenOrder.includes(screenId)) {
     return "welcome";
   }
-  if (!state.gifted && ["journey", "album", "impact"].includes(screenId)) {
+  if (!state.gifted && ["journey", "album"].includes(screenId)) {
     return "preview";
-  }
-  if (!state.albumReady && screenId === "impact") {
-    return "album";
   }
   return screenId;
 }
@@ -553,7 +551,7 @@ function goBack() {
     return;
   }
   let target = screenOrder[currentIndex - 1];
-  if (!state.gifted && ["journey", "album", "impact"].includes(target)) {
+  if (!state.gifted && ["journey", "album"].includes(target)) {
     target = "preview";
   }
   navigateTo(target, "back");
@@ -588,11 +586,11 @@ function handlePrimaryAction() {
     return;
   }
   if (state.screenId === "album") {
-    if (state.albumReady) {
-      navigateTo("impact", "forward");
-    } else {
+    if (!state.albumReady) {
       buildAlbum();
+      return;
     }
+    resetFlow();
     return;
   }
   resetFlow();
@@ -644,7 +642,7 @@ function renderScreenContent() {
   if (state.screenId === "album") {
     return renderAlbumScreen();
   }
-  return renderImpactScreen();
+  return renderAlbumScreen();
 }
 
 function renderWelcomeScreen() {
@@ -799,7 +797,7 @@ function renderAlbumScreen() {
     <section class="screen-panel">
       <div class="panel-head compact-head">
         <p class="panel-label">記録</p>
-        <p class="panel-copy">${state.albumReady ? "選んだ2つが1冊にまとまりました。" : "選んだ2つを、この画面で1冊にまとめます。"}</p>
+        <p class="panel-copy">${state.albumReady ? "これで完了です。選んだ2つが1冊にまとまりました。" : "選んだ2つを、この画面で1冊にまとめます。"}</p>
       </div>
       <article class="embedded-card album-card">
         <div class="album-grid">
@@ -814,28 +812,9 @@ function renderAlbumScreen() {
         </div>
         <p class="compact-copy">${state.albumReady ? escapeHtml(resolvedMessage()) : "相談内容と旅先で押した2つの記録が、ここで並びます。"}</p>
       </article>
-    </section>
-  `;
-}
-
-function renderImpactScreen() {
-  const region = currentRegion();
-  const spend = checkedStops().reduce((total, stop) => total + stop.spend, 0);
-  const ecPotential = Math.round(spend * 0.28);
-  return `
-    <section class="screen-panel">
-      <div class="panel-head compact-head">
-        <p class="panel-label">地域</p>
-        <p class="panel-copy">旅の体験が、地域の価値にも返っていきます。</p>
-      </div>
-      <div class="stats-grid">
-        <article class="stat-card"><span>回遊</span><strong>${state.checkedStopIds.length}/${currentRegion().stops.length}</strong></article>
-        <article class="stat-card"><span>消費</span><strong>${formatCurrency(spend)}</strong></article>
-        <article class="stat-card"><span>旅後EC</span><strong>+${formatCurrency(ecPotential)}</strong></article>
-      </div>
       <article class="embedded-card slim-card">
-        <p class="compact-copy">${escapeHtml(region.ecLabel)}</p>
-        <button class="text-button" type="button" data-action="restart">最初から見る</button>
+        <p class="section-label">${state.albumReady ? "COMPLETE" : "NEXT"}</p>
+        <p class="compact-copy">${state.albumReady ? "ギフトを贈るところから、旅の記録まで見届けました。" : "アルバムをつくると、この旅が1冊の記録として残ります。"}</p>
       </article>
     </section>
   `;
@@ -945,7 +924,11 @@ function primaryActionState() {
     };
   }
   if (state.screenId === "album") {
-    return { copy: state.albumReady ? "最後に地域価値を見ます。" : "アルバムをつくります。", label: state.albumReady ? "地域価値へ" : "アルバムをつくる", disabled: !state.albumReady && state.checkedStopIds.length < 2 };
+    return {
+      copy: state.albumReady ? "これで完了です。最初から見直せます。" : "選んだ2つを旅アルバムにまとめます。",
+      label: state.albumReady ? "最初から見る" : "アルバムをつくる",
+      disabled: !state.albumReady && state.checkedStopIds.length < 2
+    };
   }
   return { copy: "最初に戻れます。", label: "最初から見る", disabled: false };
 }
