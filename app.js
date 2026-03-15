@@ -184,6 +184,7 @@ const regions = {
 const defaultState = {
   screenId: "welcome",
   scenarioId: scenarios[0].id,
+  pendingScenarioId: scenarios[0].id,
   toneId: toneOptions[0].id,
   useCustomMessage: false,
   customMessage: "",
@@ -264,6 +265,11 @@ function bindEvents() {
       return;
     }
 
+    if (button.dataset.confirmScenarioId) {
+      confirmScenario(button.dataset.confirmScenarioId);
+      return;
+    }
+
     if (button.dataset.toneId) {
       selectTone(button.dataset.toneId);
       return;
@@ -330,6 +336,10 @@ function sanitizeState() {
     state.scenarioId = defaultState.scenarioId;
   }
 
+  if (!scenarios.some((scenario) => scenario.id === state.pendingScenarioId)) {
+    state.pendingScenarioId = state.scenarioId;
+  }
+
   if (!toneOptions.some((tone) => tone.id === state.toneId)) {
     state.toneId = defaultState.toneId;
   }
@@ -379,20 +389,35 @@ function resolvedMessage() {
 }
 
 function applyScenario(id) {
-  const scenario = scenarios.find((item) => item.id === id);
-  if (!scenario) {
+  if (!scenarios.some((item) => item.id === id)) {
     return;
   }
 
-  state.scenarioId = scenario.id;
-  state.toneId = toneOptions[0].id;
-  state.useCustomMessage = false;
-  state.customMessage = "";
-  state.gifted = false;
-  state.checkedStopIds = [];
-  state.albumReady = false;
+  state.pendingScenarioId = id;
   saveState();
   render();
+  showToast("この旅を仮選択しました。隣の「決定」で進めます。");
+}
+
+function confirmScenario(id) {
+  if (!scenarios.some((item) => item.id === id)) {
+    return;
+  }
+
+  state.pendingScenarioId = id;
+
+  if (state.scenarioId !== id) {
+    state.scenarioId = id;
+    state.toneId = toneOptions[0].id;
+    state.useCustomMessage = false;
+    state.customMessage = "";
+    state.gifted = false;
+    state.checkedStopIds = [];
+    state.albumReady = false;
+  }
+
+  saveState();
+  navigateTo("tone", "forward");
 }
 
 function selectTone(id) {
@@ -469,6 +494,7 @@ function buildAlbum() {
 function resetFlow() {
   state.screenId = "welcome";
   state.scenarioId = scenarios[0].id;
+  state.pendingScenarioId = scenarios[0].id;
   state.toneId = toneOptions[0].id;
   state.useCustomMessage = false;
   state.customMessage = "";
@@ -525,7 +551,9 @@ function handlePrimaryAction() {
   }
 
   if (state.screenId === "scenario") {
-    navigateTo("tone", "forward");
+    if (state.pendingScenarioId) {
+      confirmScenario(state.pendingScenarioId);
+    }
     return;
   }
 
@@ -684,7 +712,7 @@ function renderScenarioScreen() {
       <div class="section-head">
         <p class="section-label">STEP 1</p>
         <h2>旅を選ぶ</h2>
-        <p class="section-copy">ギフトの物語をひとつ選ぶと、このあと気持ちと一緒に旅へ変わります。</p>
+        <p class="section-copy">まず「この旅にする」で仮選択して、次に「決定」で次の画面へ進みます。</p>
       </div>
       <div class="scenario-list">
         ${renderScenarioCards()}
@@ -897,7 +925,7 @@ function renderImpactScreen() {
 
 function renderScenarioCards() {
   return scenarios.map((scenario) => `
-    <article class="scenario-card ${scenario.id === state.scenarioId ? "active" : ""}">
+    <article class="scenario-card ${scenario.id === state.pendingScenarioId ? "active" : ""}">
       <div class="scenario-top">
         <div>
           <p class="section-label">${escapeHtml(scenario.badge)}</p>
@@ -909,10 +937,16 @@ function renderScenarioCards() {
       <div class="scenario-tags">
         <span class="tag">${escapeHtml(scenario.duration)}</span>
         <span class="tag">${formatCurrency(scenario.budget)}</span>
+        ${scenario.id === state.scenarioId ? '<span class="tag">現在の確定</span>' : ""}
       </div>
-      <button class="select-button ${scenario.id === state.scenarioId ? "active" : ""}" type="button" data-scenario-id="${scenario.id}">
-        ${scenario.id === state.scenarioId ? "選択中" : "この旅にする"}
-      </button>
+      <div class="card-actions">
+        <button class="select-button ${scenario.id === state.pendingScenarioId ? "active" : ""}" type="button" data-scenario-id="${scenario.id}">
+          この旅にする
+        </button>
+        <button class="secondary-button dark confirm-button" type="button" data-confirm-scenario-id="${scenario.id}" ${scenario.id === state.pendingScenarioId ? "" : "disabled"}>
+          決定
+        </button>
+      </div>
     </article>
   `).join("");
 }
@@ -993,8 +1027,8 @@ function primaryActionState() {
 
   if (state.screenId === "scenario") {
     return {
-      copy: "旅が決まったら、次は気持ちを選ぶだけです。",
-      label: "気持ちを選ぶ",
+      copy: "「この旅にする」で選び、「決定」で次の画面へ進みます。",
+      label: "決定して次へ",
       disabled: false
     };
   }
