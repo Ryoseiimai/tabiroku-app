@@ -1,16 +1,30 @@
-const STORAGE_KEY = "tabiroku-mobile-screens-v2";
+const STORAGE_KEY = "tabiroku-mobile-screens-v3";
 
 const screenOrder = ["welcome", "scenario", "tone", "preview", "journey", "album", "impact"];
 
 const screenMeta = {
-  welcome: { eyebrow: "Gift a Journey", title: "旅録", badge: "送り主", phase: "gift" },
-  scenario: { eyebrow: "Gift", title: "旅を選ぶ", badge: "送り主", phase: "gift" },
-  tone: { eyebrow: "Gift", title: "ひとこと", badge: "送り主", phase: "gift" },
-  preview: { eyebrow: "Gift", title: "確認", badge: "送り主", phase: "gift" },
-  journey: { eyebrow: "Travel", title: "旅先ログ", badge: "旅行者", phase: "travel" },
-  album: { eyebrow: "Travel", title: "アルバム", badge: "旅行者", phase: "after" },
-  impact: { eyebrow: "Region", title: "地域価値", badge: "地域", phase: "after" }
+  welcome: { eyebrow: "相談", title: "旅の相談", badge: "送り主", phase: "gift" },
+  scenario: { eyebrow: "提案", title: "旅の提案", badge: "送り主", phase: "gift" },
+  tone: { eyebrow: "贈る", title: "届け方", badge: "送り主", phase: "gift" },
+  preview: { eyebrow: "確認", title: "ギフト確認", badge: "送り主", phase: "gift" },
+  journey: { eyebrow: "旅先", title: "旅先ログ", badge: "旅行者", phase: "travel" },
+  album: { eyebrow: "記録", title: "アルバム", badge: "旅行者", phase: "after" },
+  impact: { eyebrow: "地域", title: "地域価値", badge: "地域", phase: "after" }
 };
+
+const recipientOptions = [
+  { id: "mother", label: "母へ" },
+  { id: "friend", label: "友人へ" },
+  { id: "parents", label: "両親へ" },
+  { id: "partner", label: "パートナーへ" }
+];
+
+const intentOptions = [
+  { id: "rest", label: "ゆっくり休んでほしい" },
+  { id: "celebrate", label: "お祝いしたい" },
+  { id: "thanks", label: "感謝を伝えたい" },
+  { id: "local", label: "地域らしさを感じてほしい" }
+];
 
 const toneOptions = [
   { id: "thanks", label: "ありがとう" },
@@ -29,7 +43,7 @@ const scenarios = [
     occasion: "退職祝い",
     duration: "1泊2日",
     budget: 50000,
-    badge: "人気",
+    badge: "静かな旅",
     messages: {
       thanks: "これまで本当にありがとう。肩の力がほどける旅を贈ります。",
       otsukare: "おつかれさまの気持ちを込めて、静かな景色の旅を選びました。",
@@ -46,7 +60,7 @@ const scenarios = [
     occasion: "結婚祝い",
     duration: "2泊3日",
     budget: 80000,
-    badge: "華やか",
+    badge: "華やかな旅",
     messages: {
       thanks: "いつも支えてくれてありがとう。節目に似合う旅を贈ります。",
       otsukare: "準備をがんばったふたりへ、肩の力を抜ける時間をどうぞ。",
@@ -63,7 +77,7 @@ const scenarios = [
     occasion: "感謝を伝える旅",
     duration: "1泊2日",
     budget: 50000,
-    badge: "やさしい",
+    badge: "やさしい旅",
     messages: {
       thanks: "いつもありがとう。ふたりで景色を味わう時間を贈ります。",
       otsukare: "日々のおつかれさまを込めて、ゆるやかな海辺の旅です。",
@@ -128,6 +142,9 @@ const defaultState = {
   screenId: "welcome",
   scenarioId: scenarios[0].id,
   pendingScenarioId: scenarios[0].id,
+  recipientId: recipientOptions[0].id,
+  intentId: intentOptions[0].id,
+  request: "",
   toneId: toneOptions[0].id,
   useCustomMessage: false,
   customMessage: "",
@@ -169,11 +186,7 @@ function loadState() {
     if (!stored) {
       return { ...defaultState };
     }
-
-    return {
-      ...defaultState,
-      ...JSON.parse(stored)
-    };
+    return { ...defaultState, ...JSON.parse(stored) };
   } catch {
     return { ...defaultState };
   }
@@ -195,6 +208,20 @@ function bindEvents() {
 
     const button = target.closest("button");
     if (!(button instanceof HTMLButtonElement)) {
+      return;
+    }
+
+    if (button.dataset.recipientId) {
+      state.recipientId = button.dataset.recipientId;
+      saveState();
+      render();
+      return;
+    }
+
+    if (button.dataset.intentId) {
+      state.intentId = button.dataset.intentId;
+      saveState();
+      render();
       return;
     }
 
@@ -230,14 +257,22 @@ function bindEvents() {
 
   elements.screenView.addEventListener("input", (event) => {
     const target = event.target;
-    if (!(target instanceof HTMLInputElement) || target.id !== "customMessage") {
+    if (!(target instanceof HTMLElement)) {
       return;
     }
 
-    state.customMessage = target.value;
-    saveState();
-    if (state.screenId === "tone") {
-      render();
+    if (target.id === "requestNote" && target instanceof HTMLTextAreaElement) {
+      state.request = target.value;
+      saveState();
+      return;
+    }
+
+    if (target.id === "customMessage" && target instanceof HTMLInputElement) {
+      state.customMessage = target.value;
+      saveState();
+      if (state.screenId === "tone") {
+        render();
+      }
     }
   });
 
@@ -248,19 +283,21 @@ function sanitizeState() {
   if (!screenOrder.includes(state.screenId)) {
     state.screenId = defaultState.screenId;
   }
-
   if (!scenarios.some((scenario) => scenario.id === state.scenarioId)) {
     state.scenarioId = defaultState.scenarioId;
   }
-
   if (!scenarios.some((scenario) => scenario.id === state.pendingScenarioId)) {
     state.pendingScenarioId = state.scenarioId;
   }
-
+  if (!recipientOptions.some((item) => item.id === state.recipientId)) {
+    state.recipientId = defaultState.recipientId;
+  }
+  if (!intentOptions.some((item) => item.id === state.intentId)) {
+    state.intentId = defaultState.intentId;
+  }
   if (!toneOptions.some((tone) => tone.id === state.toneId)) {
     state.toneId = defaultState.toneId;
   }
-
   if (!Array.isArray(state.checkedStopIds)) {
     state.checkedStopIds = [];
   }
@@ -284,28 +321,24 @@ function sanitizeState() {
   }
 }
 
-function scenarioById(id) {
-  return scenarios.find((scenario) => scenario.id === id) || scenarios[0];
-}
-
 function currentScenario() {
-  return scenarioById(state.scenarioId);
-}
-
-function pendingScenario() {
-  return scenarioById(state.pendingScenarioId);
+  return scenarios.find((scenario) => scenario.id === state.scenarioId) || scenarios[0];
 }
 
 function currentRegion() {
   return regions[currentScenario().regionId];
 }
 
-function pendingRegion() {
-  return regions[pendingScenario().regionId];
-}
-
 function checkedStops() {
   return currentRegion().stops.filter((stop) => state.checkedStopIds.includes(stop.id));
+}
+
+function recipientLabel() {
+  return recipientOptions.find((item) => item.id === state.recipientId)?.label || recipientOptions[0].label;
+}
+
+function intentLabel() {
+  return intentOptions.find((item) => item.id === state.intentId)?.label || intentOptions[0].label;
 }
 
 function resolvedMessage() {
@@ -313,8 +346,90 @@ function resolvedMessage() {
   if (state.useCustomMessage && state.customMessage.trim()) {
     return state.customMessage.trim();
   }
-
   return scenario.messages[state.toneId] || scenario.messages[toneOptions[0].id];
+}
+
+function recommendationList() {
+  return scenarios
+    .map((scenario, index) => ({
+      scenario,
+      score: scoreScenario(scenario),
+      reason: reasonForScenario(scenario),
+      rank: index
+    }))
+    .sort((left, right) => right.score - left.score || left.rank - right.rank);
+}
+
+function scoreScenario(scenario) {
+  let score = 0;
+  const request = state.request;
+
+  if (state.recipientId === "mother" && scenario.id === "mother-retirement") {
+    score += 4;
+  }
+  if (state.recipientId === "friend" && scenario.id === "friend-wedding") {
+    score += 4;
+  }
+  if (state.recipientId === "parents" && scenario.id === "parents-gratitude") {
+    score += 4;
+  }
+  if (state.recipientId === "partner" && scenario.id !== "mother-retirement") {
+    score += 2;
+  }
+
+  if (state.intentId === "rest" && (scenario.id === "mother-retirement" || scenario.id === "parents-gratitude")) {
+    score += 3;
+  }
+  if (state.intentId === "celebrate" && scenario.id === "friend-wedding") {
+    score += 3;
+  }
+  if (state.intentId === "thanks" && scenario.id === "parents-gratitude") {
+    score += 3;
+  }
+  if (state.intentId === "local" && scenario.id !== "friend-wedding") {
+    score += 2;
+  }
+
+  if (includesAny(request, ["温泉", "静か", "自然", "森", "休ん"])) {
+    score += scenario.id === "mother-retirement" ? 3 : 0;
+  }
+  if (includesAny(request, ["祝い", "華やか", "結婚", "記念", "グルメ", "食"])) {
+    score += scenario.id === "friend-wedding" ? 3 : 0;
+  }
+  if (includesAny(request, ["海", "島", "感謝", "ゆっくり", "二人"])) {
+    score += scenario.id === "parents-gratitude" ? 3 : 0;
+  }
+
+  return score;
+}
+
+function reasonForScenario(scenario) {
+  const requestPart = state.request.trim() ? `「${trimText(state.request.trim(), 18)}」にも寄せています。` : "";
+
+  if (scenario.id === "mother-retirement") {
+    return `${recipientLabel()} に ${intentLabel()} を届けたい時に合う静かな旅です。${requestPart}`;
+  }
+  if (scenario.id === "friend-wedding") {
+    return `${recipientLabel()} への節目やお祝いに向く、食と街歩きの旅です。${requestPart}`;
+  }
+  return `${recipientLabel()} にやさしい時間を贈りたい時に合う、海辺の旅です。${requestPart}`;
+}
+
+function proposalBadge(index) {
+  if (index === 0) {
+    return "いちばん合う";
+  }
+  if (index === 1) {
+    return "次に合う";
+  }
+  return "別案";
+}
+
+function prepareProposal() {
+  const topScenario = recommendationList()[0]?.scenario;
+  if (topScenario) {
+    state.pendingScenarioId = topScenario.id;
+  }
 }
 
 function applyScenario(id) {
@@ -341,7 +456,6 @@ function confirmScenario(id) {
     state.checkedStopIds = [];
     state.albumReady = false;
   }
-
   saveState();
   navigateTo("tone", "forward");
 }
@@ -433,6 +547,7 @@ function goBack() {
 
 function handlePrimaryAction() {
   if (state.screenId === "welcome") {
+    prepareProposal();
     navigateTo("scenario", "forward");
     return;
   }
@@ -501,7 +616,7 @@ function renderScreenContent() {
     return renderWelcomeScreen();
   }
   if (state.screenId === "scenario") {
-    return renderScenarioScreen();
+    return renderProposalScreen();
   }
   if (state.screenId === "tone") {
     return renderToneScreen();
@@ -519,58 +634,69 @@ function renderScreenContent() {
 }
 
 function renderWelcomeScreen() {
-  const scenario = currentScenario();
-  const region = currentRegion();
   return `
-    <section class="screen-panel welcome-panel">
+    <section class="screen-panel">
       <div class="panel-head">
-        <p class="panel-label">Gift a Journey</p>
-        <h2 class="welcome-title">大切な人へ<br>旅を贈る</h2>
-        <p class="panel-copy">短い操作で、体験ギフトを送るモックです。</p>
+        <p class="panel-label">相談</p>
+        <h2 class="welcome-title">誰に贈る旅か、<br>聞かせてください</h2>
+        <p class="panel-copy">相手としたい時間をもとに、旅を出します。</p>
       </div>
-      <div class="mini-stats">
-        <article class="mini-stat"><strong>3</strong><span>贈る操作</span></article>
-        <article class="mini-stat"><strong>2</strong><span>旅先タップ</span></article>
-        <article class="mini-stat"><strong>1</strong><span>自動アルバム</span></article>
-      </div>
-      <article class="embedded-card route-card">
-        <p class="section-label">おすすめ</p>
-        <h3>${escapeHtml(scenario.title)}</h3>
-        <p class="compact-copy">${escapeHtml(region.tagline)}</p>
-        <div class="tag-row">
-          <span class="tag">${escapeHtml(scenario.recipient)}</span>
-          <span class="tag">${escapeHtml(region.name)}</span>
-          <span class="tag">${escapeHtml(scenario.duration)}</span>
+      <article class="embedded-card slim-card">
+        <div class="field-stack">
+          <p class="section-label">誰に贈る？</p>
+          <div class="tone-grid">
+            ${renderRecipientButtons()}
+          </div>
         </div>
+        <div class="field-stack">
+          <p class="section-label">どんな時間？</p>
+          <div class="tone-grid">
+            ${renderIntentButtons()}
+          </div>
+        </div>
+      </article>
+      <article class="embedded-card slim-card">
+        <p class="section-label">ひとこと要望</p>
+        <textarea id="requestNote" class="note-input" rows="3" placeholder="例: 温泉でゆっくりしてほしい / 食を楽しめる旅がいい">${escapeHtml(state.request)}</textarea>
       </article>
     </section>
   `;
 }
 
-function renderScenarioScreen() {
-  const scenario = pendingScenario();
-  const region = pendingRegion();
+function renderProposalScreen() {
+  const proposals = recommendationList();
   return `
     <section class="screen-panel">
       <div class="panel-head compact-head">
-        <p class="panel-label">STEP 1</p>
-        <p class="panel-copy">候補を選んで、決定します。</p>
+        <p class="panel-label">提案</p>
+        <p class="panel-copy">入力に合わせて、3つの旅を出しました。</p>
       </div>
-      <article class="embedded-card active-summary">
-        <div class="row-top">
-          <div>
-            <p class="section-label">選択中</p>
-            <h3>${escapeHtml(scenario.title)}</h3>
-          </div>
-          <span class="tag">${escapeHtml(region.name)}</span>
+      <article class="embedded-card slim-card">
+        <div class="tag-row summary-tags">
+          <span class="tag">${escapeHtml(recipientLabel())}</span>
+          <span class="tag">${escapeHtml(intentLabel())}</span>
         </div>
-        <div class="tag-row">
-          <span class="tag">${escapeHtml(scenario.duration)}</span>
-          <span class="tag">${formatCurrency(scenario.budget)}</span>
-        </div>
+        <p class="compact-copy">${state.request.trim() ? `要望: ${escapeHtml(trimText(state.request.trim(), 34))}` : "要望がなくても、相手と目的から旅を整えます。"}</p>
       </article>
       <div class="option-list">
-        ${renderScenarioRows()}
+        ${proposals.map((item, index) => `
+          <article class="option-row ${item.scenario.id === state.pendingScenarioId ? "selected" : ""}">
+            <div class="option-main">
+              <div class="row-top">
+                <div>
+                  <p class="section-label">${proposalBadge(index)}</p>
+                  <h3>${escapeHtml(item.scenario.title)}</h3>
+                </div>
+                <span class="tag">${escapeHtml(regions[item.scenario.regionId].name)}</span>
+              </div>
+              <p class="compact-copy">${escapeHtml(item.reason)}</p>
+            </div>
+            <div class="row-actions">
+              <button class="select-button ${item.scenario.id === state.pendingScenarioId ? "active" : ""}" type="button" data-scenario-id="${item.scenario.id}">この旅にする</button>
+              <button class="confirm-button" type="button" data-confirm-scenario-id="${item.scenario.id}" ${item.scenario.id === state.pendingScenarioId ? "" : "disabled"}>決定</button>
+            </div>
+          </article>
+        `).join("")}
       </div>
     </section>
   `;
@@ -581,13 +707,13 @@ function renderToneScreen() {
   return `
     <section class="screen-panel">
       <div class="panel-head compact-head">
-        <p class="panel-label">STEP 2</p>
+        <p class="panel-label">届け方</p>
         <p class="panel-copy">${escapeHtml(scenario.title)} に添えるひとことを選びます。</p>
       </div>
       <article class="embedded-card slim-card">
         <div class="tag-row">
-          <span class="tag">${escapeHtml(scenario.recipient)}</span>
-          <span class="tag">${escapeHtml(scenario.occasion)}</span>
+          <span class="tag">${escapeHtml(recipientLabel())}</span>
+          <span class="tag">${escapeHtml(intentLabel())}</span>
         </div>
         <div class="tone-grid">
           ${renderToneButtons()}
@@ -609,15 +735,15 @@ function renderPreviewScreen() {
   return `
     <section class="screen-panel">
       <div class="panel-head compact-head">
-        <p class="panel-label">PREVIEW</p>
-        <p class="panel-copy">贈る前の確認だけを表示します。</p>
+        <p class="panel-label">確認</p>
+        <p class="panel-copy">相談内容から整えたギフトの確認です。</p>
       </div>
       ${renderGiftCard()}
       <article class="embedded-card slim-card">
         <div class="mini-list">
           <div class="mini-row"><strong>旅先</strong><span>${escapeHtml(region.name)}</span></div>
+          <div class="mini-row"><strong>体験</strong><span>${escapeHtml(region.style)}</span></div>
           <div class="mini-row"><strong>記録</strong><span>旅先で2回タップ</span></div>
-          <div class="mini-row"><strong>旅のあと</strong><span>アルバム化</span></div>
         </div>
       </article>
     </section>
@@ -631,7 +757,7 @@ function renderJourneyScreen() {
   return `
     <section class="screen-panel">
       <div class="panel-head compact-head">
-        <p class="panel-label">TRAVEL</p>
+        <p class="panel-label">旅先</p>
         <p class="panel-copy">${escapeHtml(scenario.recipient)} が旅先で記録する画面です。</p>
       </div>
       <article class="embedded-card slim-card">
@@ -657,7 +783,7 @@ function renderAlbumScreen() {
   return `
     <section class="screen-panel">
       <div class="panel-head compact-head">
-        <p class="panel-label">ALBUM</p>
+        <p class="panel-label">記録</p>
         <p class="panel-copy">${state.albumReady ? "旅の記録が1冊にまとまりました。" : "2つそろうとアルバムになります。"}</p>
       </div>
       <article class="embedded-card album-card">
@@ -671,7 +797,7 @@ function renderAlbumScreen() {
             <div class="album-empty">旅の記録</div>
           `).join("")}
         </div>
-        <p class="compact-copy">${state.albumReady ? escapeHtml(resolvedMessage()) : "旅先で記録された体験がここに並びます。"}</p>
+        <p class="compact-copy">${state.albumReady ? escapeHtml(resolvedMessage()) : "相談内容と旅先の体験がここに並びます。"}</p>
       </article>
     </section>
   `;
@@ -684,7 +810,7 @@ function renderImpactScreen() {
   return `
     <section class="screen-panel">
       <div class="panel-head compact-head">
-        <p class="panel-label">REGION</p>
+        <p class="panel-label">地域</p>
         <p class="panel-copy">旅の体験が、地域の価値にも返っていきます。</p>
       </div>
       <div class="stats-grid">
@@ -700,24 +826,19 @@ function renderImpactScreen() {
   `;
 }
 
-function renderScenarioRows() {
-  return scenarios.map((scenario) => `
-    <article class="option-row ${scenario.id === state.pendingScenarioId ? "selected" : ""}">
-      <div class="option-main">
-        <div class="row-top">
-          <div>
-            <p class="section-label">${escapeHtml(scenario.badge)}</p>
-            <h3>${escapeHtml(scenario.title)}</h3>
-          </div>
-          <span class="tag">${escapeHtml(regions[scenario.regionId].name)}</span>
-        </div>
-        <p class="compact-copy">${escapeHtml(scenario.summary)}</p>
-      </div>
-      <div class="row-actions">
-        <button class="select-button ${scenario.id === state.pendingScenarioId ? "active" : ""}" type="button" data-scenario-id="${scenario.id}">この旅にする</button>
-        <button class="confirm-button" type="button" data-confirm-scenario-id="${scenario.id}" ${scenario.id === state.pendingScenarioId ? "" : "disabled"}>決定</button>
-      </div>
-    </article>
+function renderRecipientButtons() {
+  return recipientOptions.map((item) => `
+    <button class="tone-chip ${item.id === state.recipientId ? "active" : ""}" type="button" data-recipient-id="${item.id}">
+      ${escapeHtml(item.label)}
+    </button>
+  `).join("");
+}
+
+function renderIntentButtons() {
+  return intentOptions.map((item) => `
+    <button class="tone-chip ${item.id === state.intentId ? "active" : ""}" type="button" data-intent-id="${item.id}">
+      ${escapeHtml(item.label)}
+    </button>
   `).join("");
 }
 
@@ -740,13 +861,13 @@ function renderGiftCard() {
       </div>
       <div class="gift-copy">
         <p class="card-note">${escapeHtml(region.tagline)}</p>
-        <h3 class="card-title">${escapeHtml(scenario.recipient)}へ贈る旅</h3>
+        <h3 class="card-title">${escapeHtml(recipientLabel())}に贈る旅</h3>
         <p class="card-message">${escapeHtml(resolvedMessage())}</p>
       </div>
       <div class="tag-row">
         <span class="card-chip">${escapeHtml(region.style)}</span>
-        <span class="card-chip">${escapeHtml(scenario.duration)}</span>
-        <span class="card-chip">${formatCurrency(scenario.budget)}</span>
+        <span class="card-chip">${escapeHtml(currentScenario().duration)}</span>
+        <span class="card-chip">${formatCurrency(currentScenario().budget)}</span>
       </div>
     </article>
   `;
@@ -785,13 +906,13 @@ function renderAction() {
 
 function primaryActionState() {
   if (state.screenId === "welcome") {
-    return { copy: "まずは旅を選びます。", label: "はじめる", disabled: false };
+    return { copy: "入力から旅を提案します。", label: "旅を提案してもらう", disabled: false };
   }
   if (state.screenId === "scenario") {
-    return { copy: "選んで決定します。", label: "決定して次へ", disabled: false };
+    return { copy: "提案を選んで確定します。", label: "決定して次へ", disabled: false };
   }
   if (state.screenId === "tone") {
-    return { copy: "ひとことを選びます。", label: "確認へ", disabled: false };
+    return { copy: "届け方を整えます。", label: "確認へ", disabled: false };
   }
   if (state.screenId === "preview") {
     return {
@@ -808,6 +929,14 @@ function primaryActionState() {
     return { copy: state.albumReady ? "最後に地域価値を見ます。" : "アルバムをつくります。", label: state.albumReady ? "地域価値へ" : "アルバムをつくる", disabled: !state.albumReady && state.checkedStopIds.length < 2 };
   }
   return { copy: "最初に戻れます。", label: "最初から見る", disabled: false };
+}
+
+function includesAny(text, keywords) {
+  return keywords.some((keyword) => text.includes(keyword));
+}
+
+function trimText(text, length) {
+  return text.length > length ? `${text.slice(0, length)}…` : text;
 }
 
 function showToast(message) {
