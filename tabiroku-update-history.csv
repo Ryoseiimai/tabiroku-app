@@ -1,4 +1,5 @@
 ﻿更新日時,コミット,更新タイトル,主な更新内容,変更ファイル,ユーザーに見える変化,公開URL
+2026-03-15 14:25,326d02f,Add update history workbook,更新履歴の CSV / XLSX と、自動生成スクリプトを追加。,"tabiroku-update-history.csv, tabiroku-update-history.xlsx, tools/export_update_history.py",更新内容を表形式で共有できるようになった。,https://ryoseiimai.github.io/tabiroku-app/
 2026-03-15 13:55,702f71e,Remove user-facing impact screen,地域価値ダッシュボードを導線から外し、アルバムで完了する流れに変更。,app.js,最後がユーザー向けの完了画面として自然になった。,https://ryoseiimai.github.io/tabiroku-app/
 2026-03-15 13:53,4c74fd8,Clarify journey recording flow,旅先ログをトグル記録にし、アルバムへつながる説明文を改善。,app.js,押し間違いを戻しやすく、次の画面も理解しやすくなった。,https://ryoseiimai.github.io/tabiroku-app/
 2026-03-15 13:50,eb53459,Refine ask-first mobile flow,おすすめ先行ではなく、相手・したい時間・要望入力から旅提案する流れに変更。,"app.js, styles.css",相談してから旅が提案される体験に変わった。,https://ryoseiimai.github.io/tabiroku-app/

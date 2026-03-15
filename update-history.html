@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="旅録モックの更新履歴">
+  <title>旅録 更新履歴</title>
+  <style>
+    :root {
+      --bg: #efe5d8;
+      --bg-soft: #f7f1e8;
+      --card: rgba(255, 253, 249, 0.84);
+      --card-strong: #fffdf9;
+      --ink: #191612;
+      --muted: #71695e;
+      --line: rgba(25, 22, 18, 0.08);
+      --accent: #171717;
+      --accent-soft: #ece2d4;
+      --shadow: 0 24px 60px rgba(25, 22, 18, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Zen Kaku Gothic New", "Hiragino Sans", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top right, rgba(183, 156, 118, 0.22), transparent 28%),
+        linear-gradient(180deg, #f3eadf 0%, #e4d7c5 100%);
+    }
+
+    a {
+      color: inherit;
+    }
+
+    .page {
+      width: min(1080px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 40px 0 56px;
+    }
+
+    .hero {
+      display: grid;
+      gap: 18px;
+      padding: 28px;
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.7), rgba(247, 241, 232, 0.9));
+      box-shadow: var(--shadow);
+    }
+
+    .eyebrow {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-family: "Zen Old Mincho", serif;
+      font-size: clamp(32px, 6vw, 56px);
+      line-height: 1.08;
+    }
+
+    .hero-copy {
+      max-width: 720px;
+      margin: 0;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.65;
+    }
+
+    .hero-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .hero-links a {
+      display: inline-flex;
+      align-items: center;
+      min-height: 42px;
+      padding: 0 16px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: var(--card-strong);
+      text-decoration: none;
+    }
+
+    .hero-links a.primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .stat-card {
+      display: grid;
+      gap: 4px;
+      padding: 16px;
+      border-radius: 22px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.56);
+    }
+
+    .stat-card span {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .stat-card strong {
+      font-size: 26px;
+      line-height: 1.1;
+    }
+
+    .timeline {
+      position: relative;
+      display: grid;
+      gap: 14px;
+      margin-top: 18px;
+      padding-left: 22px;
+    }
+
+    .timeline::before {
+      content: "";
+      position: absolute;
+      top: 8px;
+      bottom: 8px;
+      left: 7px;
+      width: 2px;
+      background: rgba(25, 22, 18, 0.12);
+    }
+
+    .history-card {
+      position: relative;
+      display: grid;
+      gap: 14px;
+      padding: 20px;
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      background: var(--card);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+    }
+
+    .history-card::before {
+      content: "";
+      position: absolute;
+      top: 26px;
+      left: -21px;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 0 5px rgba(255, 248, 240, 0.95);
+    }
+
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: start;
+    }
+
+    .card-top h2 {
+      margin: 4px 0 0;
+      font-size: 24px;
+      line-height: 1.2;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 30px;
+      padding: 0 12px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--ink);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .detail,
+    .meta-copy {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .meta-grid {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      gap: 16px;
+    }
+
+    .meta-label {
+      margin: 0 0 8px;
+      color: var(--muted);
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .file-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .file-tag {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 0 10px;
+      border-radius: 999px;
+      background: rgba(23, 23, 23, 0.06);
+      font-size: 12px;
+    }
+
+    .link-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .link-row a {
+      display: inline-flex;
+      align-items: center;
+      min-height: 36px;
+      padding: 0 14px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.72);
+      text-decoration: none;
+      font-size: 13px;
+    }
+
+    @media (max-width: 720px) {
+      .page {
+        width: min(100% - 20px, 100%);
+        padding: 16px 0 32px;
+      }
+
+      .hero {
+        padding: 18px;
+        border-radius: 22px;
+      }
+
+      .stats,
+      .meta-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .timeline {
+        padding-left: 18px;
+      }
+
+      .history-card {
+        padding: 16px;
+        border-radius: 20px;
+      }
+
+      .history-card::before {
+        left: -17px;
+      }
+
+      .card-top {
+        display: grid;
+      }
+
+      .card-top h2 {
+        font-size: 19px;
+      }
+    }
+  </style>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Zen+Old+Mincho:wght@500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <main class="page">
+    <section class="hero">
+      <p class="eyebrow">Tabiroku Update History</p>
+      <h1>旅録モックの<br>更新履歴</h1>
+      <p class="hero-copy">スプレッドシートより読みやすいように、更新内容をカード型のタイムラインにまとめたページです。git 履歴から自動生成しているので、今後の更新もこのページに増えていきます。</p>
+      <div class="hero-links">
+        <a class="primary" href="https://ryoseiimai.github.io/tabiroku-app/" target="_blank" rel="noreferrer">公開モックを見る</a>
+        <a href="https://github.com/Ryoseiimai/tabiroku-app" target="_blank" rel="noreferrer">GitHub Repo</a>
+      </div>
+      <div class="stats">
+        
+      <article class="stat-card">
+        <span>更新数</span>
+        <strong>11</strong>
+      </article>
+    
+        
+      <article class="stat-card">
+        <span>最新更新</span>
+        <strong>2026-03-15 14:25</strong>
+      </article>
+    
+        
+      <article class="stat-card">
+        <span>初回更新</span>
+        <strong>2026-03-15 11:33</strong>
+      </article>
+    
+      </div>
+    </section>
+    <section class="timeline">
+      
+            <article class="history-card">
+              <div class="card-top">
+                <div>
+                  <p class="eyebrow">2026-03-15 14:25</p>
+                  <h2>Add update history workbook</h2>
+                </div>
+                <span class="badge">Latest</span>
+              </div>
+              <p class="detail">更新履歴の CSV / XLSX と、自動生成スクリプトを追加。</p>
+              <div class="meta-grid">
+                <section>
+                  <p class="meta-label">ユーザーに見える変化</p>
+                  <p class="meta-copy">更新内容を表形式で共有できるようになった。</p>
+                </section>
+                <section>
+                  <p class="meta-label">変更ファイル</p>
+                  <div class="file-tags"><span class="file-tag">tabiroku-update-history.csv</span><span class="file-tag">tabiroku-update-history.xlsx</span><span class="file-tag">tools/export_update_history.py</span></div>
+                </section>
+              </div>
+              <div class="link-row">
+                <a href="https://github.com/Ryoseiimai/tabiroku-app/commit/326d02feb4cc5871f377d0a3b51d2e1dd2d3f2f9" target="_blank" rel="noreferrer">commit 326d02f</a>
+                <a href="https://ryoseiimai.github.io/tabiroku-app/" target="_blank" rel="noreferrer">公開モック</a>
+              </div>
+            </article>
+            
+            <article class="history-card">
+              <div class="card-top">
+                <div>
+                  <p class="eyebrow">2026-03-15 13:55</p>
+                  <h2>Remove user-facing impact screen</h2>
+                </div>
+                <span class="badge">#10</span>
+              </div>
+              <p class="detail">地域価値ダッシュボードを導線から外し、アルバムで完了する流れに変更。</p>
+              <div class="meta-grid">
+                <section>
+                  <p class="meta-label">ユーザーに見える変化</p>
+                  <p class="meta-copy">最後がユーザー向けの完了画面として自然になった。</p>
+                </section>
+                <section>
+                  <p class="meta-label">変更ファイル</p>
+                  <div class="file-tags"><span class="file-tag">app.js</span></div>
+                </section>
+              </div>
+              <div class="link-row">
+                <a href="https://github.com/Ryoseiimai/tabiroku-app/commit/702f71e2906af9ce256be36907423aeaa6bdb7fd" target="_blank" rel="noreferrer">commit 702f71e</a>
+                <a href="https://ryoseiimai.github.io/tabiroku-app/" target="_blank" rel="noreferrer">公開モック</a>
+              </div>
+            </article>
+            
+            <article class="history-card">
+              <div class="card-top">
+                <div>
+                  <p class="eyebrow">2026-03-15 13:53</p>
+                  <h2>Clarify journey recording flow</h2>
+                </div>
+                <span class="badge">#9</span>
+              </div>
+              <p class="detail">旅先ログをトグル記録にし、アルバムへつながる説明文を改善。</p>
+              <div class="meta-grid">
+                <section>
+                  <p class="meta-label">ユーザーに見える変化</p>
+                  <p class="meta-copy">押し間違いを戻しやすく、次の画面も理解しやすくなった。</p>
+                </section>
+                <section>
+                  <p class="meta-label">変更ファイル</p>
+                  <div class="file-tags"><span class="file-tag">app.js</span></div>
+                </section>
+              </div>
+              <div class="link-row">
+                <a href="https://github.com/Ryoseiimai/tabiroku-app/commit/4c74fd8b9826eae8f683345e9d78c37155b29bcc" target="_blank" rel="noreferrer">commit 4c74fd8</a>
+                <a href="https://ryoseiimai.github.io/tabiroku-app/" target="_blank" rel="noreferrer">公開モック</a>
+              </div>
+            </article>
+            
+            <article class="history-card">
+              <div class="card-top">
+                <div>
+                  <p class="eyebrow">2026-03-15 13:50</p>
+                  <h2>Refine ask-first mobile flow</h2>
+                </div>
+                <span class="badge">#8</span>
+              </div>
+              <p class="detail">おすすめ先行ではなく、相手・したい時間・要望入力から旅提案する流れに変更。</p>
+              <div class="meta-grid">
+                <section>
+                  <p class="meta-label">ユーザーに見える変化</p>
+                  <p class="meta-copy">相談してから旅が提案される体験に変わった。</p>
+                </section>
+                <section>
+                  <p class="meta-label">変更ファイル</p>
+                  <div class="file-tags"><span class="file-tag">app.js</span><span class="file-tag">styles.css</span></div>
+                </section>
+              </div>
+              <div class="link-row">
+                <a href="https://github.com/Ryoseiimai/tabiroku-app/commit/eb534593eb1c7be1b1d5b619a22f91bf250797fd" target="_blank" rel="noreferrer">commit eb53459</a>
+                <a href="https://ryoseiimai.github.io/tabiroku-app/" target="_blank" rel="noreferrer">公開モック</a>
+              </div>
+            </article>
+            
+            <article class="history-card">
+              <div class="card-top">
+                <div>
+                  <p class="eyebrow">2026-03-15 12:42</p>
+                  <h2>Refine compact screen-first mock</h2>
+                </div>
+                <span class="badge">#7</span>
+              </div>
+              <p class="detail">iPhone アプリらしい見た目と操作導線になるよう再調整。</p>
+              <div class="meta-grid">
+                <section>
+                  <p class="meta-label">ユーザーに見える変化</p>
+                  <p class="meta-copy">よりスマホアプリっぽい印象に更新。</p>
+                </section>
+                <section>
+                  <p class="meta-label">変更ファイル</p>
+                  <div class="file-tags"><span class="file-tag">app.js</span><span class="file-tag">styles.css</span></div>
+                </section>
+              </div>
+              <div class="link-row">
+                <a href="https://github.com/Ryoseiimai/tabiroku-app/commit/0cd3250d94234d02f19f00d19261c5f120e7cd29" target="_blank" rel="noreferrer">commit 0cd3250</a>
+                <a href="https://ryoseiimai.github.io/tabiroku-app/" target="_blank" rel="noreferrer">公開モック</a>
+              </div>
+            </article>
+            
+            <article class="history-card">
+              <div class="card-top">
+                <div>
+                  <p class="eyebrow">2026-03-15 12:31</p>
+                  <h2>Compact mobile screens</h2>
+                </div>
+                <span class="badge">#6</span>
+              </div>
+              <p class="detail">余白、文字量、カードの高さを削って画面密度を調整。</p>
+              <div class="meta-grid">
+                <section>
+                  <p class="meta-label">ユーザーに見える変化</p>
+                  <p class="meta-copy">スクロールを減らしたコンパクト UI に改善。</p>
+                </section>
+                <section>
+                  <p class="meta-label">変更ファイル</p>
+                  <div class="file-tags"><span class="file-tag">app.js</span><span class="file-tag">styles.css</span></div>
+                </section>
+              </div>
+              <div class="link-row">
+                <a href="https://github.com/Ryoseiimai/tabiroku-app/commit/3ea4570be6a39ab3e6713157a02b578151c8d7f8" target="_blank" rel="noreferrer">commit 3ea4570</a>
+                <a href="https://ryoseiimai.github.io/tabiroku-app/" target="_blank" rel="noreferrer">公開モック</a>
+              </div>
+            </article>
+            
+            <article class="history-card">
+              <div class="card-top">
+                <div>
+                  <p class="eyebrow">2026-03-15 12:23</p>
+                  <h2>Add scenario confirmation step</h2>
+                </div>
+                <span class="badge">#5</span>
+              </div>
+              <p class="detail">旅候補を仮選択してから決定する、2段階の選択操作を追加。</p>
+              <div class="meta-grid">
+                <section>
+                  <p class="meta-label">ユーザーに見える変化</p>
+                  <p class="meta-copy">誤タップしづらい旅選択になった。</p>
+                </section>
+                <section>
+                  <p class="meta-label">変更ファイル</p>
+                  <div class="file-tags"><span class="file-tag">app.js</span><span class="file-tag">styles.css</span></div>
+                </section>
+              </div>
+              <div class="link-row">
+                <a href="https://github.com/Ryoseiimai/tabiroku-app/commit/95168854188f35b6bb435c3b8fd0d7870175361b" target="_blank" rel="noreferrer">commit 9516885</a>
+                <a href="https://ryoseiimai.github.io/tabiroku-app/" target="_blank" rel="noreferrer">公開モック</a>
+              </div>
+            </article>
+            
+            <article class="history-card">
+              <div class="card-top">
+                <div>
+                  <p class="eyebrow">2026-03-15 12:19</p>
+                  <h2>Convert mock to screen-based mobile flow</h2>
+                </div>
+                <span class="badge">#4</span>
+              </div>
+              <p class="detail">長い1ページ構成をやめて、画面遷移型のスマホモックへ変更。</p>
+              <div class="meta-grid">
+                <section>
+                  <p class="meta-label">ユーザーに見える変化</p>
+                  <p class="meta-copy">ポチポチ進めるアプリ風の体験に変更。</p>
+                </section>
+                <section>
+                  <p class="meta-label">変更ファイル</p>
+                  <div class="file-tags"><span class="file-tag">app.js</span><span class="file-tag">index.html</span><span class="file-tag">styles.css</span></div>
+                </section>
+              </div>
+              <div class="link-row">
+                <a href="https://github.com/Ryoseiimai/tabiroku-app/commit/6e438990d645f42b58c4cd445c21f34d2c587411" target="_blank" rel="noreferrer">commit 6e43899</a>
+                <a href="https://ryoseiimai.github.io/tabiroku-app/" target="_blank" rel="noreferrer">公開モック</a>
+              </div>
+            </article>
+            
+            <article class="history-card">
+              <div class="card-top">
+                <div>
+                  <p class="eyebrow">2026-03-15 12:09</p>
+                  <h2>Remove Pages workflow for initial push</h2>
+                </div>
+                <span class="badge">#3</span>
+              </div>
+              <p class="detail">GitHub Pages の公開方法を workflow からブランチ公開へ切り替えた。</p>
+              <div class="meta-grid">
+                <section>
+                  <p class="meta-label">ユーザーに見える変化</p>
+                  <p class="meta-copy">公開 URL を安定して使える状態に調整。</p>
+                </section>
+                <section>
+                  <p class="meta-label">変更ファイル</p>
+                  <div class="file-tags"><span class="file-tag">.github/workflows/pages.yml</span></div>
+                </section>
+              </div>
+              <div class="link-row">
+                <a href="https://github.com/Ryoseiimai/tabiroku-app/commit/8417a0a6a9825834ab72dbe2c8ad0e2a2dfd62f9" target="_blank" rel="noreferrer">commit 8417a0a</a>
+                <a href="https://ryoseiimai.github.io/tabiroku-app/" target="_blank" rel="noreferrer">公開モック</a>
+              </div>
+            </article>
+            
+            <article class="history-card">
+              <div class="card-top">
+                <div>
+                  <p class="eyebrow">2026-03-15 12:08</p>
+                  <h2>Ignore local GitHub CLI files</h2>
+                </div>
+                <span class="badge">#2</span>
+              </div>
+              <p class="detail">ローカルの GitHub CLI 関連ファイルを git 管理対象から外した。</p>
+              <div class="meta-grid">
+                <section>
+                  <p class="meta-label">ユーザーに見える変化</p>
+                  <p class="meta-copy">ユーザー画面の変化なし。</p>
+                </section>
+                <section>
+                  <p class="meta-label">変更ファイル</p>
+                  <div class="file-tags"><span class="file-tag">.gitignore</span></div>
+                </section>
+              </div>
+              <div class="link-row">
+                <a href="https://github.com/Ryoseiimai/tabiroku-app/commit/ced69abb1e2871a45bdbd6ee4b30e00f05e26f56" target="_blank" rel="noreferrer">commit ced69ab</a>
+                <a href="https://ryoseiimai.github.io/tabiroku-app/" target="_blank" rel="noreferrer">公開モック</a>
+              </div>
+            </article>
+            
+            <article class="history-card">
+              <div class="card-top">
+                <div>
+                  <p class="eyebrow">2026-03-15 11:33</p>
+                  <h2>Initial Tabiroku mobile mock</h2>
+                </div>
+                <span class="badge">#1</span>
+              </div>
+              <p class="detail">旅録モックの初期画面と、ギフト・旅ログの基本構成を追加。</p>
+              <div class="meta-grid">
+                <section>
+                  <p class="meta-label">ユーザーに見える変化</p>
+                  <p class="meta-copy">最初のスマホモックを確認できる状態に。</p>
+                </section>
+                <section>
+                  <p class="meta-label">変更ファイル</p>
+                  <div class="file-tags"><span class="file-tag">.github/workflows/pages.yml</span><span class="file-tag">.gitignore</span><span class="file-tag">README.md</span><span class="file-tag">app.js</span></div>
+                </section>
+              </div>
+              <div class="link-row">
+                <a href="https://github.com/Ryoseiimai/tabiroku-app/commit/123d0a676e46944324a2f637da2d99578be244f9" target="_blank" rel="noreferrer">commit 123d0a6</a>
+                <a href="https://ryoseiimai.github.io/tabiroku-app/" target="_blank" rel="noreferrer">公開モック</a>
+              </div>
+            </article>
+            
+    </section>
+  </main>
+</body>
+</html>
